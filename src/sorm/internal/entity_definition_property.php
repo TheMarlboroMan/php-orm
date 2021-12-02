@@ -6,12 +6,7 @@ namespace sorm\internal;
 */
 class entity_definition_property {
 
-	public const type_any=0;
-	public const type_int=1;
-	public const type_string=2;
-	public const type_double=3;
-	public const type_boolean=4;
-	public const type_datetime=5;
+
 
 	public function __construct(
 		string $_property,

@@ -110,15 +110,15 @@ class map_loader {
 		$this->check_property($_node, "nullable", self::check_bool);
 		$this->check_property($_node, "default", self::check_none);
 
-		$type=$type=\sorm\internal\entity_definition_property::type_any;
+		$type=$type=\sorm\types::t_any;
 		switch($_node->type) {
 
-			case "any": $type=\sorm\internal\entity_definition_property::type_any; break;
-			case "boolean": $type=\sorm\internal\entity_definition_property::type_boolean; break;
-			case "datetime": $type=\sorm\internal\entity_definition_property::type_datetime; break;
-			case "double": $type=\sorm\internal\entity_definition_property::type_double; break;
-			case "string": $type=\sorm\internal\entity_definition_property::type_string; break;
-			case "int": $type=\sorm\internal\entity_definition_property::type_int; break;
+			case "any": $type=\sorm\types::t_any; break;
+			case "boolean": $type=\sorm\types::t_boolean; break;
+			case "datetime": $type=\sorm\types::t_datetime; break;
+			case "double": $type=\sorm\types::t_double; break;
+			case "string": $type=\sorm\types::t_string; break;
+			case "int": $type=\sorm\types::t_int; break;
 			default:
 				throw new \sorm\exception\map_loader_error("unknown property type '".$_node->type."'");
 		}
