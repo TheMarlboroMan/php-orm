@@ -17,6 +17,16 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 	}
 
+	public function get_fetch_translator() : \sorm\interfaces\fetch_translator {
+
+		if(null===$this->fetch_translator) {
+
+			$this->fetch_translator=new \sorm\internal\pdo_fetch_translator();
+		}
+
+		return $this->fetch_translator;
+	}
+
 	public function create(
 		\sorm\internal\payload $_payload
 	) : \sorm\internal\value {
@@ -199,4 +209,5 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 	private array               $create_statements_map=[];
 	private array               $update_statements_map=[];
 	private array               $delete_statements_map=[];
+	private ?\sorm\interfaces\fetch_translator $fetch_translator=null;
 }

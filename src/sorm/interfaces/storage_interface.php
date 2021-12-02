@@ -3,6 +3,8 @@ namespace sorm\interfaces;
 
 interface storage_interface {
 
+	public function get_fetch_translator() :\sorm\interfaces\fetch_translator;
+
 /**
 *must create the entity defined in the payload and return its primary key,
 *of any type. Must throw if the entity cannot be persisted (for example, was

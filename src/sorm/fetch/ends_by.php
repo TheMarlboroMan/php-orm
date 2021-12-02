@@ -29,6 +29,13 @@ class ends_by implements \sorm\interfaces\fetch_node {
 		return $this->value;
 	}
 
+	public function accept(
+		\sorm\interfaces\fetch_translator $_translator
+	) : void {
+
+		$_translator->do_ends_by($this);
+	}
+
 	private int             $flags;
 	private string          $property;
 	private                 $value;

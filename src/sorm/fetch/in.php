@@ -29,6 +29,13 @@ class in implements \sorm\interfaces\fetch_node {
 		return $this->values;
 	}
 
+	public function accept(
+		\sorm\interfaces\fetch_translator $_translator
+	) : void {
+
+		$_translator->do_in($this);
+	}
+
 	private int             $flags;
 	private string          $property;
 	private array           $values;
