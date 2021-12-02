@@ -1,0 +1,7 @@
+Clone this repo:
+
+https://github.com/TheMarlboroMan/php-log
+
+all you need is the source, nothing more, in layman's terms, remove the "src" part of "src/log" so it reads "log/" and then all class files inside.
+
+And that would be all.
