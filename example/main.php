@@ -64,3 +64,33 @@ $blank_user->set_username("myusername")
 var_dump($blank_user);
 $em->create($blank_user);
 var_dump($blank_user);
+
+$blank_user->set_last_login_at(new \DateTime())
+	->set_login_count(1);
+$em->update($blank_user);
+
+var_dump($blank_user);
+
+$em->delete($blank_user);
+
+$fb=$em->get_fetch_builder();
+
+$users_10_to_30=$em->fetch(
+	\app\user::class,
+	$fb->or(
+		$fb->and(
+			$fb->equals("username", "monger"),
+			$fb->is_false("disabled")
+		),
+		$fb->and(
+			$fb->equals("username", "limited_user"),
+			$fb->lesser_than("login_count", 5)
+		)
+	),
+	$fb->order_by(
+		$fb->order("created_at", \sorm\fetch::desc),
+		$fb->order("username", \sorm\fetch::desc),
+	),
+	$fb->limit_offset(10, 30)
+);
+

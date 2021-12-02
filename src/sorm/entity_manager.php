@@ -27,11 +27,33 @@ class entity_manager {
 		$this->load_map($_map_file_path);
 	}
 
+	public function get_fetch_builder() : \sorm\fetch {
+
+		if(null===$this->fetch_builder) {
+
+			$this->fetch_builder=new \sorm\fetch;
+		}
+
+		return $this->fetch_builder;
+	}
+
 	public function enable_extra_checks() : \sorm\entity_manager {
 
 		$this->with_extra_checks=true;
 		return $this;
 	}
+
+	public function fetch(
+		string $_class,
+		\sorm\interfaces\fetch_node $_criteria,
+		?\sorm\internal\order_by $_order=null,
+		?\sorm\internal\limit_offset $_offset=null
+	) /*TODO: what does this return?? a collection, I guess */ {
+
+		//TODO:
+	}
+
+
 
 /**
 *creates a default constructed entity with all values set as default by the
@@ -152,7 +174,7 @@ class entity_manager {
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
 			}
 
-			if($pk_name===$property->get_name()) {
+			if($pk_name===$property->get_property()) {
 
 				$payload->set_primary_key(
 					new \sorm\internal\value($_entity->$getter(), $property->get_type())
@@ -204,7 +226,7 @@ class entity_manager {
 
 			//disallow updating of the primary key for the puerile reason that
 			//it would make the payload confusing with "old id" and "new id".
-			if($pk_name!==$property->get_name()) {
+			if($pk_name!==$property->get_property()) {
 
 				continue;
 			}
@@ -268,5 +290,6 @@ class entity_manager {
 	private \sorm\interfaces\entity_property_mapper $entity_property_mapper;
 	private ?\sorm\interfaces\on_default_builder    $on_default_builder;
 	private ?\sorm\interfaces\entity_name_mapper    $entity_name_mapper;
+	private ?\sorm\fetch                            $fetch_builder;
 	private array                                   $definition_map=[]; //!<Map of fully qualified classname to entity_definition.
 }

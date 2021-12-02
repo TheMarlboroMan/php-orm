@@ -24,7 +24,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		$stmt=$this->get_create_statement($_payload);
 		foreach($_payload as $key => $value) {
 
-			$stmt->bindValue(":".$key, $value->get_value(), $this->to_pdo_type($value));
+			$stmt->bindValue(":".$key, $this->to_pdo_value($value), $this->to_pdo_type($value));
 		}
 
 		if(!$stmt->execute()) {
@@ -51,10 +51,10 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 		$definition=$_payload->get_entity_definition();
 		$pk=$_payload[$definition->get_primary_key_name()];
-		$stmt->bindParam(":pk", $pk->get_value(), $this->to_pdo_type($pk));
+		$stmt->bindValue(":pk", $this->to_pdo_value($pk), $this->to_pdo_type($pk));
 		foreach($_payload as $key => $value) {
 
-			$stmt->bindParam(":".$key, $value->get_value(), $this->to_pdo_type($value));
+			$stmt->bindValue(":".$key, $this->to_pdo_value($value), $this->to_pdo_type($value));
 		}
 
 		if(!$stmt->execute()) {
@@ -75,9 +75,8 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		//The entity manager will catch anything that throws...
 		$stmt=$this->get_delete_statement($_payload);
 
-		$definition=$_payload->get_entity_definition();
-		$pk=$_payload[$definition->get_primary_key_name()];
-		$stmt->bindParam(":pk", $pk->get_value(), $this->to_pdo_type($pk));
+		$pk=$_payload->get_primary_key();
+		$stmt->bindValue(":pk", $this->to_pdo_value($pk), $this->to_pdo_type($pk));
 
 		if(!$stmt->execute()) {
 
@@ -170,6 +169,29 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 			case \sorm\types::t_bool:
 			case \sorm\types::t_int:
 				return \PDO::PARAM_INT;
+		}
+	}
+
+	private function            to_pdo_value(
+		\sorm\internal\value $_value
+	) {
+
+		if(null===$_value->get_value()) {
+
+			return null;
+		}
+
+		switch($_value->get_type()) {
+
+			case \sorm\types::t_any:
+			case \sorm\types::t_string:
+			case \sorm\types::t_double: //this never ceases to amuse me.
+			case \sorm\types::t_int:
+				return $_value->get_value();
+			case \sorm\types::t_datetime:
+				return $_value->get_value()->format("Y-m-d H:i:s");
+			case \sorm\types::t_bool:
+				return $_value->get_value() ? 1 : 0;
 		}
 	}
 
