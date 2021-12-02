@@ -32,11 +32,13 @@ $logger=new \log\out_logger(
 $entity_factory=new \oimpl\entity_factory();
 $on_default_builder=null;
 $entity_name_mapper=new \oimpl\entity_name_mapper();
+$storage_interface=new \sorm\pdo_storage_interface($PDO);
 $entity_property_mapper=new \oimpl\entity_property_mapper();
 
 $em=new \sorm\entity_manager(
 	__DIR__."/map.json",
 	$logger,
+	$storage_interface,
 	$entity_factory,
 	$entity_property_mapper,
 	$on_default_builder,

@@ -10,7 +10,6 @@ class entity_manager {
 	public function __construct(
 		string $_map_file_path,
 		\log\logger_interface $_logger,
-		bool $_with_extra_checks,
 		\sorm\interfaces\storage_interface $_storage_interface,
 		\sorm\interfaces\entity_factory $_entity_factory,
 		\sorm\interfaces\entity_property_mapper $_entity_property_mapper,
@@ -21,12 +20,17 @@ class entity_manager {
 		$this->logger=$_logger;
 		$this->storage_interface=$_storage_interface;
 		$this->entity_factory=$_entity_factory;
-		$this->with_extra_checks=$_with_extra_checks;
 		$this->entity_property_mapper=$_entity_property_mapper;
 		$this->on_default_builder=$_on_default_builder;
 		$this->entity_name_mapper=$_entity_name_mapper;
 
 		$this->load_map($_map_file_path);
+	}
+
+	public function enable_extra_checks() : \sorm\entity_manager {
+
+		$this->with_extra_checks=true;
+		return $this;
 	}
 
 /**
@@ -60,7 +64,8 @@ class entity_manager {
 	}
 
 /**
-*attempts to persist an entity to storage
+*attempts to persist an entity to storage. Rules of persistence are those of
+*the underlying storage interface.
 */
 	public function create(
 		\sorm\interfaces\entity $_entity
@@ -71,12 +76,6 @@ class entity_manager {
 
 			throw new \sorm\exception\malformed_setup("entity for '$classname' is not defined");
 		}
-
-		//TODO: check if persisted, how? I guess we have a persistor checker?
-			/**
-		*sure, and what does it do? what does the entity interface promise, if anything?
-		*we can pass the entity, the definition and the em itself, if need be.
-		*/
 
 		$definition=$this->definition_map[$classname];
 
@@ -123,6 +122,11 @@ class entity_manager {
 		}
 	}
 
+/**
+*attemps to update an entity. Rules of persistence are those of the underlying
+*storage.
+*/
+
 	public function update(
 		\sorm\interfaces\entity $_entity
 	) : \sorm\entity_manager {
@@ -133,30 +137,25 @@ class entity_manager {
 			throw new \sorm\exception\malformed_setup("entity for '$classname' is not defined");
 		}
 
-		//TODO: check if persisted, how? I guess we have a persistor checker?
-		/**
-		*sure, and what does it do? what does the entity interface promise, if anything?
-		*we can pass the entity, the definition and the em itself, if need be.
-		*/
-
 		$definition=$this->definition_map[$classname];
 		$pk_name=$definition->get_primary_key_name();
 
 		//prepare the payload.
 		$payload=new \sorm\internal\payload($definition);
+
 		foreach($definition as $property) {
-
-			//disallow updating of the primary key for the puerile reason that
-			//it would make the payload confusing with "old id" and "new id".
-			if($pk_name===$property->get_name()) {
-
-				continue;
-			}
 
 			$getter=$this->entity_property_mapper->getter_from_property($property);
 			if($this->with_extra_checks && !method_exists($_entity, $getter)) {
 
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
+			}
+
+			if($pk_name===$property->get_name()) {
+
+				$payload->set_primary_key(
+					new \sorm\internal\value($_entity->$getter(), $property->get_type())
+				);
 			}
 
 			$payload->add(
@@ -180,6 +179,11 @@ class entity_manager {
 		}
 	}
 
+/**
+*attemps to delete an entity. Rules of persistence are those of the underlying
+*storage.
+*/
+
 	public function delete(
 		\sorm\interfaces\entity $_entity
 	) : \sorm\entity_manager {
@@ -189,12 +193,6 @@ class entity_manager {
 
 			throw new \sorm\exception\malformed_setup("entity for '$classname' is not defined");
 		}
-
-		//TODO: check if persisted, how? I guess we have a persistor checker?
-		/**
-		*sure, and what does it do? what does the entity interface promise, if anything?
-		*we can pass the entity, the definition and the em itself, if need be.
-		*/
 
 		$definition=$this->definition_map[$classname];
 		$pk_name=$definition->get_primary_key_name();
@@ -216,8 +214,7 @@ class entity_manager {
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
 			}
 
-			$payload->add(
-				$property->get_property(),
+			$payload->set_primary_key(
 				new \sorm\internal\value($_entity->$getter(), $property->get_type())
 			);
 		}
@@ -266,7 +263,7 @@ class entity_manager {
 	private \log\logger_interface                   $logger;
 	private \sorm\interfaces\storage_interface      $storage_interface;
 	private \sorm\interfaces\entity_factory         $entity_factory;
-	private bool                                    $with_extra_checks;
+	private bool                                    $with_extra_checks=false;
 	private \sorm\interfaces\entity_property_mapper $entity_property_mapper;
 	private ?\sorm\interfaces\on_default_builder    $on_default_builder;
 	private ?\sorm\interfaces\entity_name_mapper    $entity_name_mapper;

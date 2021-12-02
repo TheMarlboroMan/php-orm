@@ -11,7 +11,7 @@ class entity_property_mapper implements \sorm\interfaces\entity_property_mapper 
 
 		switch($_prop->get_type()) {
 
-			case \sorm\internal\entity_definition_property::type_boolean:
+			case \sorm\types::t_bool:
 				return "is_".$_prop->get_property();
 			default:
 				return "get_".$_prop->get_property();

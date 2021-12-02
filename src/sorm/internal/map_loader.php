@@ -114,7 +114,7 @@ class map_loader {
 		switch($_node->type) {
 
 			case "any": $type=\sorm\types::t_any; break;
-			case "boolean": $type=\sorm\types::t_boolean; break;
+			case "boolean": $type=\sorm\types::t_bool; break;
 			case "datetime": $type=\sorm\types::t_datetime; break;
 			case "double": $type=\sorm\types::t_double; break;
 			case "string": $type=\sorm\types::t_string; break;

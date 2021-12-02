@@ -1,12 +1,10 @@
 <?php
 namespace sorm\internal;
 
-use ArrayAccess;
-
 /**
 *TODO:
 */
-class payload implements \Countable, \IteratorAggregate {
+class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
 
 	public function             __construct(
 		\sorm\internal\entity_definition $_definition
@@ -20,10 +18,23 @@ class payload implements \Countable, \IteratorAggregate {
 		return $this->entity_definition;
 	}
 
+	public function             set_primary_key(
+		\sorm\internal\value $_value
+	) : \sorm\internal\payload {
+
+		$this->primary_key=$_value;
+		return $this;
+	}
+
+	public function             get_primary_key() : ?\sorm\internal\value {
+
+		return $this->primary_key;
+	}
+
 	public function             add(
 		string $_key,
 		\sorm\internal\value $_value
-	) {
+	) : \sorm\internal\payload {
 
 		if(array_key_exists($_key, $this->data_map)) {
 
@@ -31,6 +42,7 @@ class payload implements \Countable, \IteratorAggregate {
 		}
 
 		$this->data_map[$_key]=$_value;
+		return $this;
 	}
 
 	//begin countable implementation
@@ -48,7 +60,39 @@ class payload implements \Countable, \IteratorAggregate {
 	}
 
 //end iteratoraggregate implementation
+//begin arrayaccess implementation
+
+	public function                 offsetExists(
+		/*mixed*/ $_offset
+	) : bool {
+
+		return array_key_exists($_offset, $this->data_map);
+	}
+
+	public function                 offsetGet(
+		/*mixed*/ $_offset
+	) /*:mixed*/ {
+
+		return $this->data_map[$_offset];
+	}
+
+	public function                 offsetSet(
+		/*mixed*/ $_offset,
+		/*mixed*/ $_value
+	) :void {
+
+		throw new \sorm\exception\exception("payload does not support setting offsets");
+	}
+
+	public function                 offsetUnset(
+		/*mixed*/ $_offset
+	) : void {
+
+		throw new \sorm\exception\exception("payload does not support unsetting of offsets");
+	}
+//end arrayaccess implementation
 
 	private \sorm\internal\entity_definition    $entity_definition;
+	private ?\sorm\internal\value               $primary_key;
 	private array                               $data_map=[];
 }
