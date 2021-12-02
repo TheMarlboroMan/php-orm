@@ -4,7 +4,7 @@ namespace sorm\internal;
 /**
 *TODO:
 */
-class entity_definition implements \Countable, \IteratorAggregate {
+class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess {
 
 /**
 *TODO:
@@ -37,7 +37,7 @@ class entity_definition implements \Countable, \IteratorAggregate {
 		\sorm\internal\entity_definition_property $_prop
 	) :\sorm\internal\entity_definition {
 
-		$this->properties[]=$_prop;
+		$this->property_map[$_prop->get_property()]=$_prop;
 		return $this;
 	}
 /**
@@ -85,20 +85,53 @@ class entity_definition implements \Countable, \IteratorAggregate {
 
 	public function                 count() : int {
 
-		return count($this->properties);
+		return count($this->property_map);
 	}
 //end countable implementation
+
 //begin iteratoraggregate implementation
 
 	public function                 getIterator() : \ArrayIterator {
 
-		return new \ArrayIterator($this->properties);
+		return new \ArrayIterator($this->property_map);
 	}
 
 //end iteratoraggregate implementation
 
+//begin arrayaccess implementation
+
+	public function                 offsetExists(
+		/*mixed*/ $_offset
+	) : bool {
+
+		return array_key_exists($_offset, $this->property_map);
+	}
+
+	public function                 offsetGet(
+		/*mixed*/ $_offset
+	) /*:mixed*/ {
+
+		return $this->property_map[$_offset];
+	}
+
+	public function                 offsetSet(
+		/*mixed*/ $_offset,
+		/*mixed*/ $_value
+	) :void {
+
+		throw new \sorm\exception\exception("entity defintion does not support setting offsets");
+	}
+
+	public function                 offsetUnset(
+		/*mixed*/ $_offset
+	) : void {
+
+		throw new \sorm\exception\exception("entity defintion does not support unsetting of offsets");
+	}
+//end arrayaccess implementation
+
 	private ?string                 $primary_key_name;
 	private string                  $classname; //!<Fully qualified classname, no excuses.
 	private string                  $storage_key;
-	private array                   $properties; //!< Array of entity_definition_property
+	private array                   $property_map; //!< Array of entity_definition_property
 }

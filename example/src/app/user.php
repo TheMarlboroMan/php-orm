@@ -3,6 +3,35 @@ namespace app;
 
 class user implements \sorm\interfaces\entity {
 
+	public function get_id() :int {
+
+		return $this->id;
+	}
+
+	public function get_username() :string {
+
+		return $this->username;
+	}
+
+	public function get_password() :string {
+
+		return $this->password;
+	}
+
+	public function get_login_count() :int {
+
+		return $this->login_count;
+	}
+
+	public function get_created_at() :?\DateTime {
+
+		return $this->created_at;
+	}
+
+	public function get_last_login_at() :?\DateTime {
+
+		return $this->last_login_at;
+	}
 
 	public function set_id(int $_value) : \app\user {
 

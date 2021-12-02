@@ -52,6 +52,7 @@ class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
 		return count($this->data_map);
 	}
 //end countable implementation
+
 //begin iteratoraggregate implementation
 
 	public function                 getIterator() : \ArrayIterator {
@@ -60,6 +61,7 @@ class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
 	}
 
 //end iteratoraggregate implementation
+
 //begin arrayaccess implementation
 
 	public function                 offsetExists(

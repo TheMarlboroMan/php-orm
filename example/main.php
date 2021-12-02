@@ -29,6 +29,12 @@ $logger=new \log\out_logger(
 	new \log\default_formatter()
 );
 
+$username="root";
+$pass="1234";
+$dsn="mysql:dbname=test;host=localhost;charset=utf8";
+
+$PDO=new \PDO($dsn, $username, $pass);
+
 $entity_factory=new \oimpl\entity_factory();
 $on_default_builder=null;
 $entity_name_mapper=new \oimpl\entity_name_mapper();
@@ -45,7 +51,16 @@ $em=new \sorm\entity_manager(
 	$entity_name_mapper
 );
 
-$user=new \app\user();
-var_dump($user);
+/**@var \app\user*/
+//TODO: on_create, on_update, on_delete...
+//TODO: test on_default builder
+//TODO: value mapper from and to application realm
+
 $blank_user=$em->build(\app\user::class);
+$blank_user->set_username("myusername")
+	->set_password(hash("SHA512", "some_pass"))
+	->set_login_count(0);
+
+var_dump($blank_user);
+$em->create($blank_user);
 var_dump($blank_user);

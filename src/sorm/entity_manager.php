@@ -101,9 +101,10 @@ class entity_manager {
 
 			//Send the payload, will return a primary key value...
 			$pk_value=$this->storage_interface->create($payload);
+			$pk_name=$definition->get_primary_key_name();
 
 			//Set the primary key value.
-			$setter=$this->entity_property_mapper->setter_from_property($definition->get_primary_key_name());
+			$setter=$this->entity_property_mapper->setter_from_property($definition[$pk_name]);
 			if($this->with_extra_checks && !method_exists($_entity, $setter)) {
 
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement setter ".$setter);

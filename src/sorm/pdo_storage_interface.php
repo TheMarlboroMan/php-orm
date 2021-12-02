@@ -2,10 +2,13 @@
 namespace sorm;
 
 /**
-*PDO storage
+*PDO storage implementation.
 */
 class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
+/**
+*class constructor. Sets the PDO mode to throw exceptions, no excuses.
+*/
 	public function __construct(
 		\PDO $_pdo
 	) {
@@ -18,16 +21,10 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		\sorm\internal\payload $_payload
 	) : \sorm\internal\value {
 
-/**
-*must create the entity defined in the payload and return its primary key,
-*of any type. Must throw if the entity cannot be persisted (for example, was
-*already persisted before).
-*/
-
 		$stmt=$this->get_create_statement($_payload);
 		foreach($_payload as $key => $value) {
 
-			$stmt->bindParam(":".$key, $value->get_value(), $this->to_pdo_type($value));
+			$stmt->bindValue(":".$key, $value->get_value(), $this->to_pdo_type($value));
 		}
 
 		if(!$stmt->execute()) {
@@ -101,11 +98,17 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		$classname=$definition->get_classname();
 		if(!array_key_exists($classname, $this->create_statements_map)) {
 
-			//TODO
-			$fields="";
-			$values="";
 
-			$query_string="INSERT INTO `".$definition->get_storage_key()."` ($fields) VALUES ($values);";
+			$fields=[];
+			$values=[];
+
+			foreach($_payload as $key => $value) {
+
+				$fields[]="`$key`";
+				$values[]=":$key";
+			}
+
+			$query_string="INSERT INTO `".$definition->get_storage_key()."` (".implode(", ", $fields).") VALUES (".implode(", ", $values).");";
 			$this->create_statements_map[$classname]=$this->pdo->prepare($query_string);
 		}
 
@@ -120,10 +123,13 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		$classname=$definition->get_classname();
 		if(!array_key_exists($classname, $this->update_statements_map)) {
 
-			//TODO:
-			$assignments="";
+			$assignments=[];
+			foreach($_payload as $key => $value) {
 
-			$query_string="UPDATE `".$definition->get_storage_key()."` SET $assignments WHERE `".$definition->get_primary_key_name()."` = :pk";
+				$assignments[]="`$key`= :$key";
+			}
+
+			$query_string="UPDATE `".$definition->get_storage_key()."` SET ".implode(", ", $assignments)." WHERE `".$definition->get_primary_key_name()."` = :pk";
 			$this->update_statements_map[$classname]=$this->pdo->prepare($query_string);
 		}
 
