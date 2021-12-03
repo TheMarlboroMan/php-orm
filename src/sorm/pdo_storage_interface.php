@@ -7,7 +7,8 @@ namespace sorm;
 class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 /**
-*class constructor. Sets the PDO mode to throw exceptions, no excuses.
+*class constructor. Sets the PDO mode to throw exceptions and to not
+*emulate prepared statements, no excuses.
 */
 	public function __construct(
 		\PDO $_pdo
@@ -15,16 +16,94 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 		$this->pdo=$_pdo;
 		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		$this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
 	}
 
-	public function get_fetch_translator() : \sorm\interfaces\fetch_translator {
+	public function fetch(
+		\sorm\internal\entity_definition $_def,
+		\sorm\internal\entity_inflator $_inflator,
+		\sorm\interfaces\fetch_node $_criteria,
+		?\sorm\internal\order_by $_order=null,
+		?\sorm\internal\limit_offset $_limit_offset=null
+	) : \sorm\interfaces\fetch_collection {
 
 		if(null===$this->fetch_translator) {
 
 			$this->fetch_translator=new \sorm\internal\pdo_fetch_translator();
 		}
 
-		return $this->fetch_translator;
+		$calc="";
+		if(
+			null !== $_limit_offset
+			&&\sorm\internal\limit_offset::no_limit !== $_limit_offset->get_limit()
+		) {
+
+			$calc="SQL_CALC_FOUND_ROWS";
+		}
+
+		//build query string...
+		$qstr="SELECT $calc * FROM `".$_def->get_storage_key()."` WHERE ";
+
+		//criteria
+		$_criteria->accept(
+			$this->fetch_translator->reset()
+		);
+
+		$qstr.=$this->fetch_translator->to_query_string();
+
+		//order by
+		if(null !== $_order && $_order->has_order()) {
+
+			$qstr.=" ORDER BY ";
+
+			$orderstr=array_map(
+				function(\sorm\internal\order $_order) : string {
+
+					$ordertype=$_order->get_order===\sorm\fetch::order_asc ? "ASC" : "DESC";
+					return "`".$_order->get_fieldname()."` ".$ordertype;
+				},
+				iterator_to_array($_order)
+			);
+
+			$qstr.=implode(", ", $orderstr);
+		}
+
+		//limit and offset
+		if(null !== $_limit_offset) {
+
+			if(\sorm\internal\limit_offset::no_limit !== $_limit_offset->get_limit()) {
+
+				$qstr.=" LIMIT ".$_limit_offset->get_limit();
+			}
+
+			if(0 !== $_limit_offset->get_offset()) {
+
+				$qstr.=" OFFSET ".$_limit_offset->get_offset();
+			}
+		}
+
+		//get statement and fill up values...
+		$hash=md5($qstr);
+		$stmt=$this->get_fetch_statement($hash, $qstr);
+
+		$i=0;
+		foreach($this->fetch_translator->get_arguments() as $arg) {
+
+			//TODO: and what PDO type would that be??
+			$stmt->bindValue(":placeholder_".$i++, $arg);
+		}
+
+		if(!$stmt->execute()) {
+
+			throw new \sorm\exception\exception("could not fetch data");
+		}
+
+		if(strlen($calc)) {
+
+			$total=$this->pdo->query('SELECT FOUND_ROWS();')->fetch(\PDO::FETCH_COLUMN);
+		}
+
+		return new \sorm\fetch_collection($stmt, $_def, $_inflator, $total);
 	}
 
 	public function create(
@@ -33,6 +112,8 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 		$stmt=$this->get_create_statement($_payload);
 		foreach($_payload as $key => $value) {
+
+			//TODO: wait wait wait, transformers!
 
 			$stmt->bindValue(":".$key, $this->to_pdo_value($value), $this->to_pdo_type($value));
 		}
@@ -63,6 +144,8 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		$pk=$_payload[$definition->get_primary_key_name()];
 		$stmt->bindValue(":pk", $this->to_pdo_value($pk), $this->to_pdo_type($pk));
 		foreach($_payload as $key => $value) {
+
+			//TODO: wait wait wait, transformers!
 
 			$stmt->bindValue(":".$key, $this->to_pdo_value($value), $this->to_pdo_type($value));
 		}
@@ -160,6 +243,20 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		return $this->delete_statements_map[$classname];
 	}
 
+	private function            get_fetch_statement(
+		string $_hash,
+		string $_query_string
+	) :\PDOStatement {
+
+
+		if(!array_key_exists($_hash, $this->fetch_statements)) {
+
+			$this->fetch_statements[$_hash]=$this->pdo->prepare($_query_string);
+		}
+
+		return $this->fetch_statements[$_hash];
+	}
+
 	private function            to_pdo_type(
 		\sorm\internal\value $_value
 	) {
@@ -209,5 +306,6 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 	private array               $create_statements_map=[];
 	private array               $update_statements_map=[];
 	private array               $delete_statements_map=[];
-	private ?\sorm\interfaces\fetch_translator $fetch_translator=null;
+	private array               $fetch_statements=[];
+	private ?\sorm\internal\pdo_fetch_translator $fetch_translator=null;
 }

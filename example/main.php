@@ -61,15 +61,15 @@ $blank_user->set_username("myusername")
 	->set_password(hash("SHA512", "some_pass"))
 	->set_login_count(0);
 
-var_dump($blank_user);
+//var_dump($blank_user);
 $em->create($blank_user);
-var_dump($blank_user);
+//var_dump($blank_user);
 
 $blank_user->set_last_login_at(new \DateTime())
 	->set_login_count(1);
 $em->update($blank_user);
 
-var_dump($blank_user);
+//var_dump($blank_user);
 
 $em->delete($blank_user);
 
@@ -79,12 +79,20 @@ $users_10_to_30=$em->fetch(
 	\app\user::class,
 	$fb->or(
 		$fb->and(
-			$fb->equals("username", "monger"),
+			$fb->str_equals_cs("username", "monger"),
 			$fb->is_false("disabled")
 		),
 		$fb->and(
-			$fb->equals("username", "limited_user"),
-			$fb->lesser_than("login_count", 5)
+			$fb->or(
+				$fb->and(
+					$fb->str_equals_cs("username", "limited_user"),
+					$fb->lesser_than("login_count", 5)
+				),
+				$fb->and(
+					$fb->str_equals_cs("username", "less_limited_user"),
+					$fb->lesser_than("login_count", 15)
+				)
+			)
 		)
 	),
 	$fb->order_by(
@@ -94,3 +102,4 @@ $users_10_to_30=$em->fetch(
 	$fb->limit_offset(10, 30)
 );
 
+print_r($users_10_to_30->all());

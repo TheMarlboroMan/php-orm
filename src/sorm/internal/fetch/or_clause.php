@@ -1,7 +1,7 @@
 <?php
-namespace sorm\fetch;
+namespace sorm\internal\fetch;
 
-class and_clause implements \sorm\interfaces\fetch_node {
+class or_clause implements \sorm\interfaces\fetch_node {
 
 	public function     __construct(
 		int $_flags,
@@ -26,7 +26,7 @@ class and_clause implements \sorm\interfaces\fetch_node {
 		\sorm\interfaces\fetch_translator $_translator
 	) : void {
 
-		$_translator->do_and($this);
+		$_translator->do_or($this);
 	}
 
 	private int          $flags;

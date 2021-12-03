@@ -33,6 +33,11 @@ class user implements \sorm\interfaces\entity {
 		return $this->last_login_at;
 	}
 
+	public function is_disabled() : bool {
+
+		return $this->disabled;
+	}
+
 	public function set_id(int $_value) : \app\user {
 
 		$this->id=$_value;
@@ -69,10 +74,17 @@ class user implements \sorm\interfaces\entity {
 		return $this;
 	}
 
+	public function set_disabled(bool $_value) : \app\user {
+
+		$this->disabled=$_value;
+		return $this;
+	}
+
 	private int             $id;
 	private string          $username;
 	private string          $password;
 	private int             $login_count;
 	private ?\DateTime      $created_at;
 	private ?\DateTime      $last_login_at;
+	private bool            $disabled;
 }

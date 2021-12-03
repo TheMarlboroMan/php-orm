@@ -49,6 +49,13 @@
 					"type":"datetime",
 					"nullable":true,
 					"default":null
+				},
+				{
+					"property":"disabled",
+					"field":"disabled",
+					"type":"bool",
+					"nullable":true,
+					"default":false
 				}
 			]
 		},

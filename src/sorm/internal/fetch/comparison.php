@@ -1,5 +1,5 @@
 <?php
-namespace sorm\fetch;
+namespace sorm\internal\fetch;
 
 class comparison implements \sorm\interfaces\fetch_node {
 

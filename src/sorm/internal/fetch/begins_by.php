@@ -1,5 +1,5 @@
 <?php
-namespace sorm\fetch;
+namespace sorm\internal\fetch;
 
 class begins_by implements \sorm\interfaces\fetch_node {
 

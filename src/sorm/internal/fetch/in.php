@@ -1,17 +1,17 @@
 <?php
-namespace sorm\fetch;
+namespace sorm\internal\fetch;
 
-class ends_by implements \sorm\interfaces\fetch_node {
+class in implements \sorm\interfaces\fetch_node {
 
 	public function     __construct(
 		int $_flags,
 		string $_property,
-		$_value
+		array $_values
 	) {
 
 		$this->flags=$_flags;
 		$this->property=$_property;
-		$this->value=$_value;
+		$this->values=$_values;
 	}
 
 	public function     get_flags() : int {
@@ -24,19 +24,19 @@ class ends_by implements \sorm\interfaces\fetch_node {
 		return $this->property;
 	}
 
-	public function     get_value() {
+	public function     get_values() : array {
 
-		return $this->value;
+		return $this->values;
 	}
 
 	public function accept(
 		\sorm\interfaces\fetch_translator $_translator
 	) : void {
 
-		$_translator->do_ends_by($this);
+		$_translator->do_in($this);
 	}
 
 	private int             $flags;
 	private string          $property;
-	private                 $value;
+	private array           $values;
 }

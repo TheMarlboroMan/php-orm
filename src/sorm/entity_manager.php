@@ -19,10 +19,9 @@ class entity_manager {
 
 		$this->logger=$_logger;
 		$this->storage_interface=$_storage_interface;
-		$this->entity_factory=$_entity_factory;
 		$this->entity_property_mapper=$_entity_property_mapper;
-		$this->on_default_builder=$_on_default_builder;
 		$this->entity_name_mapper=$_entity_name_mapper;
+		$this->entity_inflator=new \sorm\internal\entity_inflator($_entity_factory, $this->entity_property_mapper, $_on_default_builder);
 
 		$this->load_map($_map_file_path);
 	}
@@ -47,13 +46,22 @@ class entity_manager {
 		string $_class,
 		\sorm\interfaces\fetch_node $_criteria,
 		?\sorm\internal\order_by $_order=null,
-		?\sorm\internal\limit_offset $_offset=null
-	) /*TODO: what does this return?? a collection, I guess */ {
+		?\sorm\internal\limit_offset $_limit_offset=null
+	) : \sorm\interfaces\fetch_collection {
 
-		//TODO:
+		if(!array_key_exists($_class, $this->definition_map)) {
+
+			throw new \sorm\exception\malformed_setup("entity for '$_class' is not defined");
+		}
+
+		return $this->storage_interface->fetch(
+			$this->definition_map[$_class],
+			$this->entity_inflator,
+			$_criteria,
+			$_order,
+			$_limit_offset
+		);
 	}
-
-
 
 /**
 *creates a default constructed entity with all values set as default by the
@@ -68,21 +76,7 @@ class entity_manager {
 			throw new \sorm\exception\malformed_setup("entity for '$_class' is not defined");
 		}
 
-		$definition=$this->definition_map[$_class];
-
-		$entity=$this->entity_factory->build_entity($definition->get_classname());
-
-		$this->set_entity_default_values(
-			$entity,
-			$_class
-		);
-
-		if(null!==$this->on_default_builder) {
-
-			$this->on_default_builder->on_default_build($entity);
-		}
-
-		return $entity;
+		return $this->entity_inflator->build_entity($this->definition_map[$_class]);
 	}
 
 /**
@@ -257,24 +251,6 @@ class entity_manager {
 		}
 	}
 
-	private function set_entity_default_values(
-		\sorm\interfaces\entity $_entity,
-		string $_class
-	) {
-
-		foreach($this->definition_map[$_class] as $property) {
-
-			$setter=$this->entity_property_mapper->setter_from_property($property);
-
-			if($this->with_extra_checks && !method_exists($_entity, $setter)) {
-
-				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement setter ".$setter);
-			}
-
-			$_entity->$setter($property->get_default());
-		}
-	}
-
 	private function load_map(
 		string $_filename
 	) {
@@ -285,11 +261,9 @@ class entity_manager {
 
 	private \log\logger_interface                   $logger;
 	private \sorm\interfaces\storage_interface      $storage_interface;
-	private \sorm\interfaces\entity_factory         $entity_factory;
 	private bool                                    $with_extra_checks=false;
 	private \sorm\interfaces\entity_property_mapper $entity_property_mapper;
-	private ?\sorm\interfaces\on_default_builder    $on_default_builder;
 	private ?\sorm\interfaces\entity_name_mapper    $entity_name_mapper;
-	private ?\sorm\fetch                            $fetch_builder;
+	private ?\sorm\fetch                            $fetch_builder=null;
 	private array                                   $definition_map=[]; //!<Map of fully qualified classname to entity_definition.
 }

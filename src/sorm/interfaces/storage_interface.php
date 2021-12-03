@@ -3,7 +3,17 @@ namespace sorm\interfaces;
 
 interface storage_interface {
 
+	public function fetch(
+		\sorm\internal\entity_definition $_def,
+		\sorm\internal\entity_inflator $_inflator,
+		\sorm\interfaces\fetch_node $_criteria,
+		?\sorm\internal\order_by $_order=null,
+		?\sorm\internal\limit_offset $_offset=null
+	) : \sorm\interfaces\fetch_collection;
+
+/*
 	public function get_fetch_translator() :\sorm\interfaces\fetch_translator;
+*/
 
 /**
 *must create the entity defined in the payload and return its primary key,

@@ -1,17 +1,15 @@
 <?php
-namespace sorm\fetch;
+namespace sorm\internal\fetch;
 
-class contains implements \sorm\interfaces\fetch_node {
+class is_true implements \sorm\interfaces\fetch_node {
 
 	public function     __construct(
 		int $_flags,
-		string $_property,
-		$_value
+		string $_property
 	) {
 
 		$this->flags=$_flags;
 		$this->property=$_property;
-		$this->value=$_value;
 	}
 
 	public function     get_flags() : int {
@@ -24,19 +22,13 @@ class contains implements \sorm\interfaces\fetch_node {
 		return $this->property;
 	}
 
-	public function     get_value() {
-
-		return $this->value;
-	}
-
 	public function accept(
 		\sorm\interfaces\fetch_translator $_translator
 	) : void {
 
-		$_translator->do_contains($this);
+		$_translator->do_is_true($this);
 	}
 
 	private int             $flags;
 	private string          $property;
-	private                 $value;
 }
