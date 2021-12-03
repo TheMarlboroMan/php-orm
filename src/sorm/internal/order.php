@@ -1,6 +1,9 @@
 <?php
 namespace sorm\internal;
-
+/**
+*a single order clause, expresses that fetch results must be ordered according
+*to the given field name and in the given order.
+*/
 class order {
 
 	public function __construct(
@@ -12,10 +15,18 @@ class order {
 		$this->order=$_order;
 	}
 
+/**
+*returns the field name.
+*/
+
 	public function         get_fieldname() :string {
 
 		return $this->fieldname;
 	}
+
+/**
+*returns the order type, which corresponds to one of the fetch class constants.
+*/
 
 	public function         get_order() :int {
 

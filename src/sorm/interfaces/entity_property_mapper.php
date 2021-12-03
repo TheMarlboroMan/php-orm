@@ -2,17 +2,19 @@
 namespace sorm\interfaces;
 
 /**
-*TODO:
+*defines a class that, given a fully qualified class name and an entity
+*property definition, can return the name of the setter and getter methods.
 */
+
 interface entity_property_mapper {
 
 /**
-*TODO:
+*must return the getter method name from the given property.
 */
-	public function getter_from_property(\sorm\internal\entity_definition_property $_prop) : string;
+	public function getter_from_property(string $_classname, \sorm\internal\entity_definition_property $_prop) : string;
 
 /**
-*TODO:
+*must return the setter method name from the given property.
 */
-	public function setter_from_property(\sorm\internal\entity_definition_property $_prop) : string;
+	public function setter_from_property(string $_classname, \sorm\internal\entity_definition_property $_prop) : string;
 }

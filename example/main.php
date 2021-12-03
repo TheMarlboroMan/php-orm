@@ -29,6 +29,21 @@ $logger=new \log\out_logger(
 	new \log\default_formatter()
 );
 
+/**
+use a table like this:
+
+CREATE TABLE `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(200) NOT NULL,
+  `password` varchar(200) NOT NULL,
+  `login_count` int(10) unsigned NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `last_login_at` datetime DEFAULT NULL,
+  `super_disabled` enum('Y','N') NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM
+*/
+
 $username="root";
 $pass="1234";
 $dsn="mysql:dbname=test;host=localhost;charset=utf8";
@@ -89,8 +104,6 @@ foreach($users_10_to_30->all() as $user) {
 
 	echo $user->get_username().PHP_EOL;
 }
-
-
 
 /**@var \app\user*/
 /*

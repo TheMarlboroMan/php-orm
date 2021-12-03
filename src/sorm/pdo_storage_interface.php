@@ -187,7 +187,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 	) : \PDOStatement {
 
 		$definition=$_payload->get_entity_definition();
-		$classname=$definition->get_classname();
+		$classname=$definition->get_class_name();
 		if(!array_key_exists($classname, $this->create_statements_map)) {
 
 
@@ -212,7 +212,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 	) : \PDOStatement {
 
 		$definition=$_payload->get_entity_definition();
-		$classname=$definition->get_classname();
+		$classname=$definition->get_class_name();
 		if(!array_key_exists($classname, $this->update_statements_map)) {
 
 			$assignments=[];
@@ -233,7 +233,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 	) : \PDOStatement {
 
 		$definition=$_payload->get_entity_definition();
-		$classname=$definition->get_classname();
+		$classname=$definition->get_class_name();
 		if(!array_key_exists($classname, $this->delete_statements_map)) {
 
 			$query_string="DELETE FROM `".$definition->get_storage_key()."` WHERE `".$definition->get_primary_key_name()."` = :pk";

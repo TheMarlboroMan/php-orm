@@ -3,6 +3,9 @@ namespace sorm\internal;
 
 use \sorm\internal\fetch\flags as flags;
 
+/**
+*provides a fetch translator for PDO.
+*/
 class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 
 	public function __construct(
@@ -24,17 +27,26 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		return $this;
 	}
 
+/**
+*returns the query string that was built from this translator.
+*/
+
 	public function to_query_string() : string {
 
 		return implode(" ", $this->buffer);
 	}
 
+/**
+*returns any arguments that could be inferred from the query nodes.
+*/
 	public function get_arguments() : array {
 
 		return $this->arguments;
 	}
 
-
+/**
+*implementation of fetch_translator
+*/
 	public function do_and(\sorm\internal\fetch\and_clause $_node) : void {
 
 		if($_node->get_flags() & flags::negative) {
@@ -58,7 +70,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		$this->buffer[]=")";
 	}
 
-
+/**
+*implementation of fetch_translator
+*/
 	public function do_or(\sorm\internal\fetch\or_clause $_node) : void {
 
 		if($_node->get_flags() & flags::negative) {
@@ -82,6 +96,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		$this->buffer[]=")";
 	}
 
+/**
+*implementation of fetch_translator
+*/
 	public function do_begins_by(\sorm\internal\fetch\begins_by $_node) : void {
 
 		$flags=$_node->get_flags();
@@ -97,6 +114,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			: "(`$field` $boolean_logic LIKE $placeholder_mark)";
 	}
 
+/**
+*implementation of fetch_translator
+*/
 	public function do_comparison(\sorm\internal\fetch\comparison $_node) : void {
 
 		if(
@@ -124,6 +144,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		}
 	}
 
+/**
+*implementation of fetch_translator
+*/
 	public function do_contains(\sorm\internal\fetch\contains $_node) : void {
 
 		$flags=$_node->get_flags();
@@ -139,6 +162,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			: "(`$field` $boolean_logic LIKE $placeholder_mark)";
 	}
 
+/**
+*implementation of fetch_translator
+*/
 	public function do_ends_by(\sorm\internal\fetch\ends_by $_node) : void {
 
 		$flags=$_node->get_flags();
@@ -154,6 +180,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			: "(`$field` $boolean_logic LIKE $placeholder_mark)";
 	}
 
+/**
+*implementation of fetch_translator
+*/
 	public function do_in(\sorm\internal\fetch\in $_node) : void {
 
 		$flags=$_node->get_flags();
@@ -172,6 +201,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		$this->buffer[]="(`$field` $boolean_logic IN (".implode(", ", $placeholder_marks).") )";
 	}
 
+/**
+*implementation of fetch_translator
+*/
 	public function do_is_true(\sorm\internal\fetch\is_true $_node) : void {
 
 		$field=$this->to_storage_name($_node->get_property());
@@ -180,6 +212,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			: "(`$field`)";
 	}
 
+/**
+*creates a numeric comparison
+*/
 	private function do_numeric_comparison(
 		\sorm\internal\fetch\comparison $_node
 	) {
@@ -227,6 +262,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		$this->buffer[]="(`$field` $operator $placeholder_mark)";
 	}
 
+/**
+*creates a string comparison
+*/
 	private function do_string_comparison(
 		\sorm\internal\fetch\comparison $_node
 	) {
@@ -251,6 +289,10 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		$this->buffer[]="(`$field` $operator BINARY $placeholder_mark)";
 	}
 
+/**
+*adds a new argument to the argument cache and generates its placeholder for
+*the prepared statement.
+*/
 	private function make_argument(
 		$_value,
 		string $_property
@@ -268,6 +310,9 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 		return $placeholder;
 	}
 
+/**
+*transforms a property to its storage name.
+*/
 	private function to_storage_name(
 		string $_propname
 	) {

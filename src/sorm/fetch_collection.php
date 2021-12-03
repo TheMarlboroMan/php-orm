@@ -1,6 +1,10 @@
 <?php
 namespace sorm;
 
+/**
+*the result of a fetch operation allowing access (not neccesarily containing)
+*the resulting entities.
+*/
 class fetch_collection implements \sorm\interfaces\fetch_collection {
 
 	public function         __construct(
@@ -19,16 +23,25 @@ class fetch_collection implements \sorm\interfaces\fetch_collection {
 		$this->inflator=$_inflator;
 	}
 
+/**
+*implementation of fetch_collection
+*/
 	public function         get_count() : int {
 
 		return $this->count;
 	}
 
+/**
+*implementation of fetch_collection
+*/
 	public function         get_unlimited_count() : int {
 
 		return $this->unlimited_count;
 	}
 
+/**
+*implementation of fetch_collection
+*/
 	public function         next() : ?\sorm\interfaces\entity {
 
 		$data=$this->statement->fetch(\PDO::FETCH_ASSOC);
@@ -41,6 +54,9 @@ class fetch_collection implements \sorm\interfaces\fetch_collection {
 		return $this->inflator->inflate($entity, $this->definition, $data);
 	}
 
+/**
+*implementation of fetch_collection
+*/
 	public function         all() : array {
 
 		$result=[];

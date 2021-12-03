@@ -9,9 +9,11 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ## Unreleased
 ### Pending
 
-- documentation
 - on_create, on_update, on_delete...
 - test on_default builder
+- order should not use field name, but property name and be mapped somewhere.
+- readme documentation
+- cover edge cases (boolean testing for non-boolean transformations)
 
 ## [v0.0.1]: 2021-12-03
 ### Added
@@ -19,3 +21,4 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 - added mapping from property name to storage name for queries.
 - added inflators so arrays and maps can be turned into entities.
 - added data transformers from and to storage
+- quick documentation on each class and method

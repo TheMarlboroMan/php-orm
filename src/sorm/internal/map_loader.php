@@ -2,7 +2,7 @@
 namespace sorm\internal;
 
 /**
-*TODO:
+*this class takes a map file and sets up entity definitions from it.
 */
 class map_loader {
 
@@ -14,6 +14,11 @@ class map_loader {
 		$this->logger=$_logger;
 		$this->entity_name_mapper=$_entity_name_mapper;
 	}
+
+/**
+*loads entity definitions from the filename into the target map, in which the
+*fully qualified class name will be used as a key.
+*/
 
 	public function load(
 		string $_filename,
@@ -46,12 +51,12 @@ class map_loader {
 
 				$entity=$this->build_entity_definition($entity_node);
 
-				if(array_key_exists($entity->get_classname(), $_target)) {
+				if(array_key_exists($entity->get_class_name(), $_target)) {
 
-					throw new \sorm\exception\map_loader_error("definition for '".$entity->get_classname()."' has already been given!");
+					throw new \sorm\exception\map_loader_error("definition for '".$entity->get_class_name()."' has already been given!");
 				}
 
-				$_target[$entity->get_classname()]=$entity;
+				$_target[$entity->get_class_name()]=$entity;
 			}
 		}
 		catch(\sorm\exception\map_loader_error $e) {
@@ -59,6 +64,10 @@ class map_loader {
 			throw new \sorm\exception\map_loader_error("could not build entity definition: ".$e->getMessage());
 		}
 	}
+
+/**
+*infers an entity classname from the value exposed in a map file
+*/
 
 	private function infer_classname(
 		\stdClass $_node
@@ -71,6 +80,10 @@ class map_loader {
 			? $entity_name
 			: $this->entity_name_mapper->map_name($entity_name);
 	}
+
+/**
+*internal method, builds a complete entity definition.
+*/
 
 	private function build_entity_definition(
 		\stdClass $_node
@@ -99,6 +112,10 @@ class map_loader {
 
 		return $def;
 	}
+
+/**
+*internal method, builds a complete entity property.
+*/
 
 	private function build_entity_definition_property(
 		\stdClass $_node
@@ -146,6 +163,10 @@ class map_loader {
 			$transform_method
 		);
 	}
+
+/**
+*checks if the property exists and matches the given type. Throws on failure.
+*/
 
 	private const check_none=0;
 	private const check_array=1;

@@ -1,6 +1,10 @@
 <?php
 namespace sorm\internal;
 
+/**
+*this class loads values into entities.
+*/
+
 class entity_inflator {
 
 	public function __construct(
@@ -16,11 +20,14 @@ class entity_inflator {
 		$this->value_mapper_factory=$_value_mapper_factory;
 	}
 
+/**
+*builds a new entity loaded with default values.
+*/
 	public function build_entity(
 		\sorm\internal\entity_definition $_definition
 	) :\sorm\interfaces\entity {
 
-		$entity=$this->entity_factory->build_entity($_definition->get_classname());
+		$entity=$this->entity_factory->build_entity($_definition->get_class_name());
 		$this->set_entity_default_values($entity, $_definition);
 
 		if(null!==$this->on_default_builder) {
@@ -31,15 +38,22 @@ class entity_inflator {
 		return $entity;
 	}
 
+/**
+*loads the given entity with the data map, which is expressed as storage map
+*key to value.
+*/
+
 	public function inflate(
 		\sorm\interfaces\entity $_entity,
 		\sorm\internal\entity_definition $_definition,
 		array $_data
 	) : \sorm\interfaces\entity {
 
+		$classname=get_class($_entity);
+
 		foreach($_definition as $property) {
 
-			$setter=$this->property_mapper->setter_from_property($property);
+			$setter=$this->property_mapper->setter_from_property($classname, $property);
 			$fieldname=$property->get_field();
 
 			if(array_key_exists($fieldname, $_data)) {
@@ -84,14 +98,20 @@ class entity_inflator {
 		return $_entity;
 	}
 
+/**
+*sets the entity default values according to the entity definition.
+*/
+
 	private function set_entity_default_values(
 		\sorm\interfaces\entity $_entity,
 		\sorm\internal\entity_definition $_definition
 	) : void {
 
+		$classname=get_class($_entity);
+
 		foreach($_definition as $property) {
 
-			$setter=$this->property_mapper->setter_from_property($property);
+			$setter=$this->property_mapper->setter_from_property($classname, $property);
 
 			//Won't even check, sorry.
 			$_entity->$setter($property->get_default());

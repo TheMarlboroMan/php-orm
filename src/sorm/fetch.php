@@ -3,11 +3,19 @@ namespace sorm;
 
 use \sorm\internal\fetch\flags as flags;
 
+/**
+*allows to construct fetch actions, which is the way in which the entity
+*manager can tell the storage layer what to retrieve. Let us not fool ourselves,
+*this is clearly based on sql, but lacks many sql specifics.
+*/
 class fetch {
 
 	public const    order_asc=0;
 	public const    order_desc=1;
 
+/**
+*creates a complete order_by object with the order clauses given as arguments.
+*/
 	public function order_by(
 		...$_orders
 	) : \sorm\internal\order_by {
@@ -15,6 +23,9 @@ class fetch {
 		return new \sorm\internal\order_by($_orders);
 	}
 
+/**
+*creates a singular order clause.
+*/
 	public function order(
 		string $_fieldname,
 		int $_order=1 //desc
@@ -23,6 +34,9 @@ class fetch {
 		return new \sorm\internal\order($_fieldname, $_order);
 	}
 
+/**
+*creates a limit-offset instruction.
+*/
 	public const limit_none=-1;
 	public function limit_offset(
 		int $_limit=-1,
@@ -32,6 +46,10 @@ class fetch {
 		return new \sorm\internal\limit_offset($_limit, $_offset);
 	}
 
+/**
+*creates a group of clauses which must all be true for the clause to be
+*successful.
+*/
 	public function and(
 		...$_nodes
 	) : \sorm\interfaces\fetch_node {
@@ -39,6 +57,10 @@ class fetch {
 		return new \sorm\internal\fetch\and_clause(flags::none, $_nodes);
 	}
 
+/**
+*creates a group of clauses which will fail must all be false for the clause to
+*be successful.
+*/
 	public function and_not(
 		...$_nodes
 	) : \sorm\interfaces\fetch_node {
@@ -46,6 +68,10 @@ class fetch {
 		return new \sorm\internal\fetch\and_clause(flags::negative, $_nodes);
 	}
 
+/**
+*creates a group of clauses of which one must be true for the clause to be
+*successful.
+*/
 	public function or(
 		...$_nodes
 	) : \sorm\interfaces\fetch_node {
@@ -53,6 +79,10 @@ class fetch {
 		return new \sorm\internal\fetch\or_clause(flags::none, $_nodes);
 	}
 
+/**
+*creates a group of clauses which one must be false for the clause to be
+*successful.
+*/
 	public function or_not(
 		...$_nodes
 	) : \sorm\interfaces\fetch_node {
@@ -280,6 +310,9 @@ class fetch {
 		return new \sorm\internal\fetch\comparison(flags::case_sensitive | flags::equal | flags::negative, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a string that begins by a value.
+*/
 	public function str_begins_by_cs(
 		string $_property,
 		$_value
@@ -288,6 +321,9 @@ class fetch {
 		return new \sorm\internal\fetch\begins_by(flags::case_sensitive, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a string that does not begin by a value.
+*/
 	public function str_not_begins_by_cs(
 		string $_property,
 		$_value
@@ -296,6 +332,9 @@ class fetch {
 		return new \sorm\internal\fetch\begins_by(flags::case_sensitive | flags::negative, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a string that ends by a value.
+*/
 	public function str_ends_by_cs(
 		string $_property,
 		$_value
@@ -304,6 +343,9 @@ class fetch {
 		return new \sorm\internal\fetch\ends_by(flags::case_sensitive, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a string that does not end by a value.
+*/
 	public function str_not_ends_by_cs(
 		string $_property,
 		$_value
@@ -312,6 +354,9 @@ class fetch {
 		return new \sorm\internal\fetch\ends_by(flags::case_sensitive | flags::negative, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a string that contains a value.
+*/
 	public function str_contains_cs(
 		string $_property,
 		$_value
@@ -320,6 +365,9 @@ class fetch {
 		return new \sorm\internal\fetch\contains(flags::case_sensitive, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a string that does not contain a value.
+*/
 	public function str_not_contains_cs(
 		string $_property,
 		$_value
@@ -328,6 +376,10 @@ class fetch {
 		return new \sorm\internal\fetch\contains(flags::case_sensitive | flags::negative, $_property, $_value);
 	}
 
+/**
+*case sensitive string check for a value that can be evaluated as a boolean and
+*must be true in order to succeed.
+*/
 	public function is_true(
 		string $_property
 	) : \sorm\interfaces\fetch_node {
@@ -335,6 +387,10 @@ class fetch {
 		return new \sorm\internal\fetch\is_true(flags::none, $_property);
 	}
 
+/**
+*case sensitive string check for a value that can be evaluated as a boolean and
+*must be false in order to succeed.
+*/
 	public function is_false(
 		string $_property
 	) : \sorm\interfaces\fetch_node {
@@ -342,6 +398,9 @@ class fetch {
 		return new \sorm\internal\fetch\is_true(flags::negative, $_property);
 	}
 
+/**
+*checks for a value to be in a list of values.
+*/
 	public function in(
 		string $_property,
 		...$_values
@@ -350,6 +409,9 @@ class fetch {
 		return new \sorm\internal\fetch\in(flags::none, $_property, $_values);
 	}
 
+/**
+*checks for a value not to be in a list of values.
+*/
 	public function not_in(
 		string $_property,
 		...$_values

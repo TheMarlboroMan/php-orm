@@ -2,7 +2,9 @@
 namespace sorm\internal;
 
 /**
-*TODO:
+*a payload that will be sent to the storage layer with data needed to perform
+*create, update and delete operations. May include a collection of values
+*to be set.
 */
 class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
 
@@ -13,11 +15,18 @@ class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
 		$this->entity_definition=$_definition;
 	}
 
+/**
+*returns the entity definition that corresponds to this payload (that is,
+*the payload corresponds to a given entity).
+*/
 	public function             get_entity_definition() : \sorm\internal\entity_definition {
 
 		return $this->entity_definition;
 	}
 
+/**
+*sets the primary key (as a value) for update and delete operations.
+*/
 	public function             set_primary_key(
 		\sorm\internal\value $_value
 	) : \sorm\internal\payload {
@@ -26,11 +35,17 @@ class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
 		return $this;
 	}
 
+/**
+*returns the primary key for update and delete operations.
+*/
 	public function             get_primary_key() : ?\sorm\internal\value {
 
 		return $this->primary_key;
 	}
 
+/**
+*adds a new value to the payload (e.g. a new field to be updated).
+*/
 	public function             add(
 		string $_key,
 		\sorm\internal\value $_value

@@ -1,6 +1,11 @@
 <?php
 namespace sorm\internal;
 
+/**
+*expresses that the results of a fetch operation must be ordered in a specific
+*manner, consisting on a sequence of order clauses.
+*/
+
 class order_by implements \IteratorAggregate{
 
 	public function __construct(
@@ -9,6 +14,10 @@ class order_by implements \IteratorAggregate{
 
 		$this->order_nodes=$_order_nodes;
 	}
+
+/**
+*returns true if any order clause is specified.
+*/
 
 	public function has_order() : bool {
 

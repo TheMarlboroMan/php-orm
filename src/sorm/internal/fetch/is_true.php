@@ -1,6 +1,10 @@
 <?php
 namespace sorm\internal\fetch;
 
+/**
+*expresses a clause in which a given property can be evaluated as a boolean
+*value.
+*/
 class is_true implements \sorm\interfaces\fetch_node {
 
 	public function     __construct(
@@ -12,16 +16,25 @@ class is_true implements \sorm\interfaces\fetch_node {
 		$this->property=$_property;
 	}
 
+/**
+*returns the clause flags.
+*/
 	public function     get_flags() : int {
 
 		return $this->flags;
 	}
 
+/**
+*returns the entity property name which will be tested as a boolean.
+*/
 	public function     get_property() : string {
 
 		return $this->property;
 	}
 
+/**
+*implementation of fetch_node.
+*/
 	public function accept(
 		\sorm\interfaces\fetch_translator $_translator
 	) : void {

@@ -1,6 +1,9 @@
 <?php
 namespace sorm\internal\fetch;
 
+/**
+*expresses a sequence of clauses out of which one of them must be true.
+*/
 class or_clause implements \sorm\interfaces\fetch_node {
 
 	public function     __construct(
@@ -12,16 +15,25 @@ class or_clause implements \sorm\interfaces\fetch_node {
 		$this->clauses=$_clauses;
 	}
 
+/**
+*returns the clause flags.
+*/
 	public function     get_flags() : int {
 
 		return $this->flags;
 	}
 
+/**
+*returns the collection of internal clauses.
+*/
 	public function     get_clauses() : array {
 
 		return $this->clauses;
 	}
 
+/**
+*implementation of fetch_node.
+*/
 	public function accept(
 		\sorm\interfaces\fetch_translator $_translator
 	) : void {

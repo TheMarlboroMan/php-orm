@@ -1,6 +1,9 @@
 <?php
 namespace sorm\internal;
 
+/**
+*defines a payload value, consisting of a value and its type.
+*/
 class value {
 
 	public function         __construct(
@@ -12,11 +15,18 @@ class value {
 		$this->value=$_value;
 	}
 
+/**
+*returns the value type as expressed in \sorm\types.
+*/
+
 	public function         get_type() : int {
 
 		return $this->type;
 	}
 
+/**
+*returns the value itself, of mixed type.
+*/
 	public function         get_value() {
 
 		return $this->value;

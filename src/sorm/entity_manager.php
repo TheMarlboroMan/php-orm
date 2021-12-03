@@ -2,9 +2,10 @@
 namespace sorm;
 
 /**
-*TODO:
+*acts as an interface between the application and the storage layer. Can
+*retrieve, create, update and delete entities. Must be provided with a number
+*of implementation-dependant instances to work.
 */
-
 class entity_manager {
 
 	public function __construct(
@@ -32,6 +33,9 @@ class entity_manager {
 		$this->load_map($_map_file_path);
 	}
 
+/**
+*returns the fetch builder, with which to build fetch actions.
+*/
 	public function get_fetch_builder() : \sorm\fetch {
 
 		if(null===$this->fetch_builder) {
@@ -42,12 +46,19 @@ class entity_manager {
 		return $this->fetch_builder;
 	}
 
+/**
+*enables some extra checks to be performed. Nothing to gain from it, the
+*application will crash all the same if the tests do not perform well.
+*/
 	public function enable_extra_checks() : \sorm\entity_manager {
 
 		$this->with_extra_checks=true;
 		return $this;
 	}
 
+/**
+*retrieves a collection of entities from the database.
+*/
 	public function fetch(
 		string $_class,
 		\sorm\interfaces\fetch_node $_criteria,
@@ -106,7 +117,7 @@ class entity_manager {
 		$payload=new \sorm\internal\payload($definition);
 		foreach($definition as $property) {
 
-			$getter=$this->entity_property_mapper->getter_from_property($property);
+			$getter=$this->entity_property_mapper->getter_from_property($classname, $property);
 
 			if($this->with_extra_checks && !method_exists($_entity, $getter)) {
 
@@ -140,7 +151,7 @@ class entity_manager {
 			$pk_name=$definition->get_primary_key_name();
 
 			//Set the primary key value.
-			$setter=$this->entity_property_mapper->setter_from_property($definition[$pk_name]);
+			$setter=$this->entity_property_mapper->setter_from_property($classname, $definition[$pk_name]);
 			if($this->with_extra_checks && !method_exists($_entity, $setter)) {
 
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement setter ".$setter);
@@ -163,7 +174,6 @@ class entity_manager {
 *attemps to update an entity. Rules of persistence are those of the underlying
 *storage.
 */
-
 	public function update(
 		\sorm\interfaces\entity $_entity
 	) : \sorm\entity_manager {
@@ -182,7 +192,7 @@ class entity_manager {
 
 		foreach($definition as $property) {
 
-			$getter=$this->entity_property_mapper->getter_from_property($property);
+			$getter=$this->entity_property_mapper->getter_from_property($classname, $property);
 			if($this->with_extra_checks && !method_exists($_entity, $getter)) {
 
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
@@ -233,7 +243,6 @@ class entity_manager {
 *attemps to delete an entity. Rules of persistence are those of the underlying
 *storage.
 */
-
 	public function delete(
 		\sorm\interfaces\entity $_entity
 	) : \sorm\entity_manager {
@@ -258,7 +267,7 @@ class entity_manager {
 				continue;
 			}
 
-			$getter=$this->entity_property_mapper->getter_from_property($property);
+			$getter=$this->entity_property_mapper->getter_from_property($classname, $property);
 			if($this->with_extra_checks && !method_exists($_entity, $getter)) {
 
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
@@ -284,6 +293,9 @@ class entity_manager {
 		}
 	}
 
+/**
+*performs internal initialization.
+*/
 	private function load_map(
 		string $_filename
 	) {

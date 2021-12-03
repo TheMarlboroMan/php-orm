@@ -1,8 +1,16 @@
 <?php
 namespace sorm\interfaces;
 
+/**
+*defines a class that is able to interact with a storage layer.
+*/
+
 interface storage_interface {
 
+/**
+*must retrieve records from the storage layer. Records must reside in a fetch
+*collection.
+*/
 	public function fetch(
 		\sorm\internal\entity_definition $_def,
 		\sorm\internal\entity_inflator $_inflator,
@@ -11,10 +19,6 @@ interface storage_interface {
 		?\sorm\internal\order_by $_order=null,
 		?\sorm\internal\limit_offset $_offset=null
 	) : \sorm\interfaces\fetch_collection;
-
-/*
-	public function get_fetch_translator() :\sorm\interfaces\fetch_translator;
-*/
 
 /**
 *must create the entity defined in the payload and return its primary key,

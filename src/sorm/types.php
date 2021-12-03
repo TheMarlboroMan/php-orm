@@ -1,6 +1,9 @@
 <?php
 namespace sorm;
 
+/**
+*defines value types.
+*/
 abstract class types {
 
 	public const t_any=0;

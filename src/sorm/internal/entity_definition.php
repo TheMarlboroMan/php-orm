@@ -2,12 +2,13 @@
 namespace sorm\internal;
 
 /**
-*TODO:
+*defines a complete entity and a few characterisicts of how it relates to
+*the storage layer. If used as an array, the property definitions are accesed.
 */
 class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess {
 
 /**
-*TODO:
+*returns true if this entity has a primary key defined.
 */
 	public function                 has_primary_key() : bool {
 
@@ -15,7 +16,7 @@ class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess 
 	}
 
 /**
-*TODO:
+*returns the name of the property that represents the primary key.
 */
 	public function                 get_primary_key_name() : ?string {
 
@@ -23,7 +24,8 @@ class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess 
 	}
 
 /**
-*TODO:
+*returns the implementation dependant (e.g. table name) name of the storage
+*where these entities reside.
 */
 	public function                 get_storage_key() : string {
 
@@ -31,7 +33,7 @@ class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess 
 	}
 
 /**
-*TODO:
+*adds a new property to the entity definition.
 */
 	public function                 add_property(
 		\sorm\internal\entity_definition_property $_prop
@@ -41,7 +43,7 @@ class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess 
 		return $this;
 	}
 /**
-*TODO:
+*sets the primary key name.
 **/
 	public function                 set_primary_key_name(
 		string $_val
@@ -52,15 +54,15 @@ class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess 
 	}
 
 /**
-*TODO:
+*returns the class name, which a fully qualified class name.
 */
-	public function                 get_classname() : string {
+	public function                 get_class_name() : string {
 
 		return $this->classname;
 	}
 
 /**
-*TODO:
+*sets the fully qualified classname.
 */
 	public function                 set_classname(
 		string $_val
@@ -71,7 +73,7 @@ class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess 
 	}
 
 /**
-*TODO:
+*sets the name of the storage key.
 */
 	public function                 set_storage_key(
 		string $_val

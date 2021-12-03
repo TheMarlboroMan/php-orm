@@ -6,6 +6,7 @@ use sorm\internal\entity_definition_property;
 class entity_property_mapper implements \sorm\interfaces\entity_property_mapper {
 
 	public function getter_from_property(
+		string $_classname,
 		entity_definition_property $_prop
 	): string {
 
@@ -19,6 +20,7 @@ class entity_property_mapper implements \sorm\interfaces\entity_property_mapper 
 	}
 
 	public function setter_from_property(
+		string $_classname,
 		entity_definition_property $_prop
 	): string {
 
