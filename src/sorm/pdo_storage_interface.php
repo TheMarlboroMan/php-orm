@@ -22,6 +22,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 	public function fetch(
 		\sorm\internal\entity_definition $_def,
 		\sorm\internal\entity_inflator $_inflator,
+		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory,
 		\sorm\interfaces\fetch_node $_criteria,
 		?\sorm\internal\order_by $_order=null,
 		?\sorm\internal\limit_offset $_limit_offset=null
@@ -29,7 +30,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 		if(null===$this->fetch_translator) {
 
-			$this->fetch_translator=new \sorm\internal\pdo_fetch_translator();
+			$this->fetch_translator=new \sorm\internal\pdo_fetch_translator($_def, $_value_mapper_factory);
 		}
 
 		$calc="";
@@ -81,7 +82,6 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 				$qstr.=" OFFSET ".$_limit_offset->get_offset();
 			}
 		}
-
 
 		//get statement and fill up values...
 		$hash=md5($qstr);

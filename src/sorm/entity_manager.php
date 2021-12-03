@@ -22,7 +22,12 @@ class entity_manager {
 		$this->storage_interface=$_storage_interface;
 		$this->entity_property_mapper=$_entity_property_mapper;
 		$this->entity_name_mapper=$_entity_name_mapper;
-		$this->entity_inflator=new \sorm\internal\entity_inflator($_entity_factory, $this->entity_property_mapper, $_value_mapper_factory, $_on_default_builder);
+		$this->entity_inflator=new \sorm\internal\entity_inflator(
+			$_entity_factory,
+			$this->entity_property_mapper,
+			$_on_default_builder,
+			$_value_mapper_factory
+		);
 
 		$this->load_map($_map_file_path);
 	}
@@ -58,6 +63,7 @@ class entity_manager {
 		return $this->storage_interface->fetch(
 			$this->definition_map[$_class],
 			$this->entity_inflator,
+			$this->value_mapper_factory,
 			$_criteria,
 			$_order,
 			$_limit_offset

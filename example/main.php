@@ -40,7 +40,7 @@ $on_default_builder=null;
 $entity_name_mapper=new \oimpl\entity_name_mapper();
 $storage_interface=new \sorm\pdo_storage_interface($PDO);
 $entity_property_mapper=new \oimpl\entity_property_mapper();
-$value_mapper_factory=null;
+$value_mapper_factory=new \oimpl\value_mapper_factory();
 
 $em=new \sorm\entity_manager(
 	__DIR__."/map.json",
@@ -53,28 +53,6 @@ $em=new \sorm\entity_manager(
 	$entity_name_mapper
 );
 
-/**@var \app\user*/
-//TODO: on_create, on_update, on_delete...
-//TODO: test on_default builder
-//TODO: value mapper from and to application realm
-
-$blank_user=$em->build(\app\user::class);
-$blank_user->set_username("myusername")
-	->set_password(hash("SHA512", "some_pass"))
-	->set_login_count(0);
-
-//var_dump($blank_user);
-$em->create($blank_user);
-//var_dump($blank_user);
-
-$blank_user->set_last_login_at(new \DateTime())
-	->set_login_count(1);
-$em->update($blank_user);
-
-//var_dump($blank_user);
-
-$em->delete($blank_user);
-
 $fb=$em->get_fetch_builder();
 
 $users_10_to_30=$em->fetch(
@@ -82,17 +60,20 @@ $users_10_to_30=$em->fetch(
 	$fb->or(
 		$fb->and(
 			$fb->str_equals_cs("username", "monger"),
-			$fb->is_false("disabled")
+			$fb->is_true("login_count"),
+			$fb->str_equals_ci("disabled", "n")
 		),
 		$fb->and(
 			$fb->or(
 				$fb->and(
 					$fb->str_equals_cs("username", "limited_user"),
-					$fb->lesser_than("login_count", 5)
+					$fb->lesser_than("login_count", 5),
+					$fb->str_equals_ci("disabled", "n")
 				),
 				$fb->and(
 					$fb->str_equals_cs("username", "less_limited_user"),
-					$fb->lesser_than("login_count", 15)
+					$fb->lesser_than("login_count", 15),
+					$fb->str_equals_ci("disabled", "n")
 				)
 			)
 		)
@@ -104,4 +85,33 @@ $users_10_to_30=$em->fetch(
 	$fb->limit_offset(2, 0)
 );
 
-print_r($users_10_to_30->all());
+foreach($users_10_to_30->all() as $user) {
+
+	echo $user->get_username().PHP_EOL;
+}
+
+
+
+/**@var \app\user*/
+/*
+$blank_user=$em->build(\app\user::class);
+$blank_user->set_username("myusername")
+	->set_password(hash("SHA512", "some_pass"))
+	->set_login_count(0);
+
+var_dump($blank_user);
+
+die();
+
+$em->create($blank_user);
+//var_dump($blank_user);
+
+$blank_user->set_last_login_at(new \DateTime())
+	->set_login_count(1);
+$em->update($blank_user);
+
+//var_dump($blank_user);
+
+$em->delete($blank_user);
+*/
+

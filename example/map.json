@@ -52,10 +52,11 @@
 				},
 				{
 					"property":"disabled",
-					"field":"disabled",
+					"field":"super_disabled",
 					"type":"bool",
 					"nullable":true,
-					"default":false
+					"default":false,
+					"transform":"mytransformer:y_n_bool"
 				}
 			]
 		},

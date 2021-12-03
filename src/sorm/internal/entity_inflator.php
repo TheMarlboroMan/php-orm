@@ -44,11 +44,12 @@ class entity_inflator {
 
 			if(array_key_exists($fieldname, $_data)) {
 
+				//TODO: Map this!!
 				$value=$_data[$fieldname];
 				if(null!==$this->value_mapper_factory && null!==$property->get_transform_key()) {
 
 					$transform=$this->value_mapper_factory->build_value_mapper($property->get_transform_key());
-					$value=$transform->from_storage($property->get_transform_value(), $value);
+					$value=$transform->from_storage($property->get_transform_method(), $value);
 
 					if(! (is_scalar($value) || null===$value)) {
 

@@ -5,6 +5,15 @@ use \sorm\internal\fetch\flags as flags;
 
 class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 
+	public function __construct(
+		\sorm\internal\entity_definition $_def,
+		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory
+	) {
+
+		$this->entity_definition=$_def;
+		$this->value_mapper_factory=$_value_mapper_factory;
+	}
+
 /***
 *resets the internal buffer so it can build another query...
 */
@@ -76,8 +85,8 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	public function do_begins_by(\sorm\internal\fetch\begins_by $_node) : void {
 
 		$flags=$_node->get_flags();
-		$field=$_node->get_property();
-		$placeholder_mark=$this->make_argument($_node->get_value()."%");
+		$field=$this->to_storage_name($_node->get_property());
+		$placeholder_mark=$this->make_argument($_node->get_value()."%", $_node->get_property());
 
 		$boolean_logic=$flags & flags::negative
 			? "NOT"
@@ -118,8 +127,8 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	public function do_contains(\sorm\internal\fetch\contains $_node) : void {
 
 		$flags=$_node->get_flags();
-		$field=$_node->get_property();
-		$placeholder_mark=$this->make_argument("%".$_node->get_value()."%");
+		$field=$this->to_storage_name($_node->get_property());
+		$placeholder_mark=$this->make_argument("%".$_node->get_value()."%", $_node->get_property());
 
 		$boolean_logic=$flags & flags::negative
 			? "NOT"
@@ -133,8 +142,8 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	public function do_ends_by(\sorm\internal\fetch\ends_by $_node) : void {
 
 		$flags=$_node->get_flags();
-		$field=$_node->get_property();
-		$placeholder_mark=$this->make_argument("%".$_node->get_value());
+		$field=$this->to_storage_name($_node->get_property());
+		$placeholder_mark=$this->make_argument("%".$_node->get_value(), $_node->get_property());
 
 		$boolean_logic=$flags & flags::negative
 			? "NOT"
@@ -148,10 +157,10 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	public function do_in(\sorm\internal\fetch\in $_node) : void {
 
 		$flags=$_node->get_flags();
-		$field=$_node->get_property();
+		$field=$this->to_storage_name($_node->get_property());
 		$placeholder_marks=array_map(
-			function($_value) {
-				return $this->make_argument($_value);
+			function($_value) use ($_node) {
+				return $this->make_argument($_value, $_node->get_property());
 			},
 			$_node->get_values()
 		);
@@ -165,7 +174,7 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 
 	public function do_is_true(\sorm\internal\fetch\is_true $_node) : void {
 
-		$field=$_node->get_property();
+		$field=$this->to_storage_name($_node->get_property());
 		$this->buffer[]=$_node->get_flags() & flags::negative
 			? "(NOT `$field`)"
 			: "(`$field`)";
@@ -176,14 +185,29 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	) {
 
 		$flags=$_node->get_flags();
-		switch(true) {
-			case $flags & flags::equal | flags::lesser_than: $operator="<="; break;
-			case $flags & flags::equal | flags::greater_than: $operator=">="; break;
-			case $flags & flags::equal: $operator="="; break;
-			case $flags & flags::lesser_than: $operator="<"; break;
-			case $flags & flags::greater_than: $operator=">"; break;
-			default:
-				throw new \sorm\exception\exception("malformed numeric comparison");
+		if( (flags::equal | flags::lesser_than) == ($flags & (flags::equal | flags::lesser_than))) {
+
+			$operator="<=";
+		}
+		else if( (flags::equal | flags::greater_than) == ($flags & (flags::equal | flags::greater_than))) {
+
+			$operator=">=";
+		}
+		else if($flags & flags::equal) {
+
+			$operator="=";
+		}
+		else if($flags & flags::lesser_than) {
+
+			$operator="<";
+		}
+		else if($flags & flags::greater_than) {
+
+			$operator=">";
+		}
+		else {
+
+			throw new \sorm\exception\exception("malformed numeric comparison");
 		}
 
 		if($flags & flags::negative) {
@@ -198,8 +222,8 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			}
 		}
 
-		$field=$_node->get_property();
-		$placeholder_mark=$this->make_argument($_node->get_value());
+		$field=$this->to_storage_name($_node->get_property());
+		$placeholder_mark=$this->make_argument($_node->get_value(), $_node->get_property());
 		$this->buffer[]="(`$field` $operator $placeholder_mark)";
 	}
 
@@ -222,18 +246,33 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			}
 		}
 
-		$field=$_node->get_property();
-		$placeholder_mark=$this->make_argument($_node->get_value());
+		$field=$this->to_storage_name($_node->get_property());
+		$placeholder_mark=$this->make_argument($_node->get_value(), $_node->get_property());
 		$this->buffer[]="(`$field` $operator BINARY $placeholder_mark)";
 	}
 
 	private function make_argument(
-		$_value
+		$_value,
+		string $_property
 	) {
 
 		$placeholder=":placeholder_".count($this->arguments);
+		$def=$this->entity_definition[$_property];
+		if(null !== $this->value_mapper_factory && null !== $def->get_transform_key()) {
+
+			$mapper=$this->value_mapper_factory->build_value_mapper($def->get_transform_key());
+			$_value=$mapper->to_storage($def->get_transform_method(), $_value);
+		}
+
 		$this->arguments[]=$_value;
 		return $placeholder;
+	}
+
+	private function to_storage_name(
+		string $_propname
+	) {
+
+		return $this->entity_definition[$_propname]->get_field();
 	}
 
 /*
@@ -251,6 +290,8 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	private array                   $custom_handlers=[];
 */
 
-	private array                   $buffer=[];
-	private array                   $arguments=[];
+	private array                               $buffer=[];
+	private array                               $arguments=[];
+	private \sorm\internal\entity_definition    $entity_definition;
+	private ?\sorm\interfaces\value_mapper_factory $value_mapper_factory;
 }

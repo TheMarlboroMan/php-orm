@@ -6,6 +6,7 @@ interface storage_interface {
 	public function fetch(
 		\sorm\internal\entity_definition $_def,
 		\sorm\internal\entity_inflator $_inflator,
+		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory,
 		\sorm\interfaces\fetch_node $_criteria,
 		?\sorm\internal\order_by $_order=null,
 		?\sorm\internal\limit_offset $_offset=null
