@@ -13,6 +13,7 @@ class entity_manager {
 		\sorm\interfaces\storage_interface $_storage_interface,
 		\sorm\interfaces\entity_factory $_entity_factory,
 		\sorm\interfaces\entity_property_mapper $_entity_property_mapper,
+		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory,
 		?\sorm\interfaces\on_default_builder $_on_default_builder,
 		?\sorm\interfaces\entity_name_mapper $_entity_name_mapper
 	) {
@@ -21,7 +22,7 @@ class entity_manager {
 		$this->storage_interface=$_storage_interface;
 		$this->entity_property_mapper=$_entity_property_mapper;
 		$this->entity_name_mapper=$_entity_name_mapper;
-		$this->entity_inflator=new \sorm\internal\entity_inflator($_entity_factory, $this->entity_property_mapper, $_on_default_builder);
+		$this->entity_inflator=new \sorm\internal\entity_inflator($_entity_factory, $this->entity_property_mapper, $_value_mapper_factory, $_on_default_builder);
 
 		$this->load_map($_map_file_path);
 	}
@@ -106,10 +107,23 @@ class entity_manager {
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
 			}
 
+			$value=$_entity->$getter();
+
+			if(null!==$this->value_mapper_factory && null!==$property->get_transform_key()) {
+
+				$transform=$this->value_mapper_factory->build_value_mapper($property->get_transform_key());
+				$value=$transform->from_storage($property->get_transform_value(), $value);
+
+				if(! (is_scalar($value) || null===$value)) {
+
+					throw new \sorm\exception\value_map("expected scalar value from '".$property->get_transform_key().":".$property->get_transform_value()."'");
+				}
+			}
 			//this actually allows you to specify a primary key
+
 			$payload->add(
 				$property->get_property(),
-				new \sorm\internal\value($_entity->$getter(), $property->get_type())
+				new \sorm\internal\value($value, $property->get_type())
 			);
 		}
 
@@ -168,16 +182,29 @@ class entity_manager {
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement getter ".$getter);
 			}
 
+			$value=$_entity->$getter();
+
+			if(null!==$this->value_mapper_factory && null!==$property->get_transform_key()) {
+
+				$transform=$this->value_mapper_factory->build_value_mapper($property->get_transform_key());
+				$value=$transform->from_storage($property->get_transform_value(), $value);
+
+				if(! (is_scalar($value) || null===$value)) {
+
+					throw new \sorm\exception\value_map("expected scalar value from '".$property->get_transform_key().":".$property->get_transform_value()."'");
+				}
+			}
+
 			if($pk_name===$property->get_property()) {
 
 				$payload->set_primary_key(
-					new \sorm\internal\value($_entity->$getter(), $property->get_type())
+					new \sorm\internal\value($value, $property->get_type())
 				);
 			}
 
 			$payload->add(
 				$property->get_property(),
-				new \sorm\internal\value($_entity->$getter(), $property->get_type())
+				new \sorm\internal\value($value, $property->get_type())
 			);
 		}
 
@@ -265,5 +292,6 @@ class entity_manager {
 	private \sorm\interfaces\entity_property_mapper $entity_property_mapper;
 	private ?\sorm\interfaces\entity_name_mapper    $entity_name_mapper;
 	private ?\sorm\fetch                            $fetch_builder=null;
+	private ?\sorm\interfaces\value_mapper_factory  $value_mapper_factory=null;
 	private array                                   $definition_map=[]; //!<Map of fully qualified classname to entity_definition.
 }

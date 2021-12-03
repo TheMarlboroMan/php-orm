@@ -123,12 +123,27 @@ class map_loader {
 				throw new \sorm\exception\map_loader_error("unknown property type '".$_node->type."'");
 		}
 
+		$transform_key=null;
+		$transform_method=null;
+
+		if(property_exists($_node, "transform")) {
+
+			$this->check_property($_node, "transform", self::check_string);
+			if(1 !== substr_count($_node->transform, ":")) {
+				throw new \sorm\exception\map_loader_error("malformed transform type, must be key:method");
+			}
+
+			list($transform_key, $transform_method)=explode(":", $_node->transform);
+		}
+
 		return new \sorm\internal\entity_definition_property(
 			$_node->property,
 			$_node->field,
 			$type,
 			$_node->nullable,
-			$_node->default
+			$_node->default,
+			$transform_key,
+			$transform_method
 		);
 	}
 

@@ -8,8 +8,12 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 
 ## Unreleased
 ### Pending
+- add mapping from property name to storage name for queries.
 - add data transformers from and to application, do it as a class that receives entity and property name.
-- add inflators so arrays and maps can be turned into entities.
+- documentation
 
-## [v0.0.1]: 2021-12-01
+## [v0.0.1]: 2021-12-03
+### Added
+- bare minimals
+- add inflators so arrays and maps can be turned into entities.
 

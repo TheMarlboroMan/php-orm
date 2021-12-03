@@ -6,12 +6,14 @@ class entity_inflator {
 	public function __construct(
 		\sorm\interfaces\entity_factory $_entity_factory,
 		\sorm\interfaces\entity_property_mapper $_property_mapper,
-		?\sorm\interfaces\on_default_builder $_on_default_builder
+		?\sorm\interfaces\on_default_builder $_on_default_builder,
+		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory
 	) {
 
 		$this->entity_factory=$_entity_factory;
 		$this->property_mapper=$_property_mapper;
 		$this->on_default_builder=$_on_default_builder;
+		$this->value_mapper_factory=$_value_mapper_factory;
 	}
 
 	public function build_entity(
@@ -40,30 +42,39 @@ class entity_inflator {
 			$setter=$this->property_mapper->setter_from_property($property);
 			$fieldname=$property->get_field();
 
-			//Won't even check, sorry.
 			if(array_key_exists($fieldname, $_data)) {
+
+				$value=$_data[$fieldname];
+				if(null!==$this->value_mapper_factory && null!==$property->get_transform_key()) {
+
+					$transform=$this->value_mapper_factory->build_value_mapper($property->get_transform_key());
+					$value=$transform->from_storage($property->get_transform_value(), $value);
+
+					if(! (is_scalar($value) || null===$value)) {
+
+						throw new \sorm\exception\value_map("expected scalar value from '".$property->get_transform_key().":".$property->get_transform_value()."'");
+					}
+				}
 
 				switch($property->get_type()) {
 
-				//TODO: here's where the converters make magic!
-
 					case \sorm\types::t_any:
-						$_entity->$setter($_data[$fieldname]);
+						$_entity->$setter($value);
 					break;
 					case \sorm\types::t_bool:
-						$_entity->$setter((bool)$_data[$fieldname]);
+						$_entity->$setter((bool)$value);
 					break;
 					case \sorm\types::t_datetime:
-						$_entity->$setter(new \DateTime($_data[$fieldname]));
+						$_entity->$setter(new \DateTime($value));
 					break;
 					case \sorm\types::t_double:
-						$_entity->$setter((double)$_data[$fieldname]);
+						$_entity->$setter((double)$value);
 					break;
 					case \sorm\types::t_int:
-						$_entity->$setter((int)$_data[$fieldname]);
+						$_entity->$setter((int)$value);
 					break;
 					case \sorm\types::t_string:
-						$_entity->$setter((string)$_data[$fieldname]);
+						$_entity->$setter((string)$value);
 					break;
 				}
 			}
@@ -89,4 +100,5 @@ class entity_inflator {
 	private \sorm\interfaces\entity_factory         $entity_factory;
 	private \sorm\interfaces\entity_property_mapper $property_mapper;
 	private ?\sorm\interfaces\on_default_builder    $on_default_builder;
+	private ?\sorm\interfaces\value_mapper_factory  $value_mapper_factory;
 }

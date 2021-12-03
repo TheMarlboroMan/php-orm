@@ -40,6 +40,7 @@ $on_default_builder=null;
 $entity_name_mapper=new \oimpl\entity_name_mapper();
 $storage_interface=new \sorm\pdo_storage_interface($PDO);
 $entity_property_mapper=new \oimpl\entity_property_mapper();
+$value_mapper_factory=null;
 
 $em=new \sorm\entity_manager(
 	__DIR__."/map.json",
@@ -47,6 +48,7 @@ $em=new \sorm\entity_manager(
 	$storage_interface,
 	$entity_factory,
 	$entity_property_mapper,
+	$value_mapper_factory,
 	$on_default_builder,
 	$entity_name_mapper
 );
@@ -96,10 +98,10 @@ $users_10_to_30=$em->fetch(
 		)
 	),
 	$fb->order_by(
-		$fb->order("created_at", \sorm\fetch::desc),
-		$fb->order("username", \sorm\fetch::desc),
+		$fb->order("created_at", \sorm\fetch::order_desc),
+		$fb->order("username", \sorm\fetch::order_desc),
 	),
-	$fb->limit_offset(10, 30)
+	$fb->limit_offset(2, 0)
 );
 
 print_r($users_10_to_30->all());

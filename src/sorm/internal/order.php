@@ -9,7 +9,7 @@ class order {
 	) {
 
 		$this->fieldname=$_fieldname;
-		$this->order===$_order;
+		$this->order=$_order;
 	}
 
 	public function         get_fieldname() :string {

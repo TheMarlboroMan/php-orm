@@ -59,7 +59,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 			$orderstr=array_map(
 				function(\sorm\internal\order $_order) : string {
 
-					$ordertype=$_order->get_order===\sorm\fetch::order_asc ? "ASC" : "DESC";
+					$ordertype=$_order->get_order()===\sorm\fetch::order_asc ? "ASC" : "DESC";
 					return "`".$_order->get_fieldname()."` ".$ordertype;
 				},
 				iterator_to_array($_order)
@@ -81,6 +81,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 				$qstr.=" OFFSET ".$_limit_offset->get_offset();
 			}
 		}
+
 
 		//get statement and fill up values...
 		$hash=md5($qstr);
@@ -106,14 +107,15 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		return new \sorm\fetch_collection($stmt, $_def, $_inflator, $total);
 	}
 
+/**
+*the payload comes with all transformed values already!
+*/
 	public function create(
 		\sorm\internal\payload $_payload
 	) : \sorm\internal\value {
 
 		$stmt=$this->get_create_statement($_payload);
 		foreach($_payload as $key => $value) {
-
-			//TODO: wait wait wait, transformers!
 
 			$stmt->bindValue(":".$key, $this->to_pdo_value($value), $this->to_pdo_type($value));
 		}
@@ -144,8 +146,6 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		$pk=$_payload[$definition->get_primary_key_name()];
 		$stmt->bindValue(":pk", $this->to_pdo_value($pk), $this->to_pdo_type($pk));
 		foreach($_payload as $key => $value) {
-
-			//TODO: wait wait wait, transformers!
 
 			$stmt->bindValue(":".$key, $this->to_pdo_value($value), $this->to_pdo_type($value));
 		}
