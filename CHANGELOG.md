@@ -15,6 +15,16 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 - readme documentation
 - cover edge cases (boolean testing for non-boolean transformations)
 
+## [v0.0.2]: 2021-12-05
+### Added
+- fetch one and fetch_by_id to entity manager
+
+### Changed
+- changes return type of entity manager create, update and delete
+
+### Fixed
+- fixes entity inflator not workirg properly with default datetimes.
+
 ## [v0.0.1]: 2021-12-03
 ### Added
 - bare minimals

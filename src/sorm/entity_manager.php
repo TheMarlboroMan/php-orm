@@ -115,6 +115,22 @@ public function fetch_one(
 }
 
 /**
+*alias for fetch_one with the primary key (numeric only!!)
+*/
+	public function fetch_by_id(
+		string $_class,
+		int $_id
+	) : ?\sorm\interfaces\entity {
+
+		//TODO: The definition map is not checked.
+
+		return $this->fetch_one(
+			$_class,
+			$this->fetch->equals($this->definition_map[$_class]->get_primary_key_name(), $_id)
+		);
+	}
+
+/**
 *creates a default constructed entity with all values set as default by the
 *map file.
 */
@@ -132,11 +148,11 @@ public function fetch_one(
 
 /**
 *attempts to persist an entity to storage. Rules of persistence are those of
-*the underlying storage interface.
+*the underlying storage interface. Returns the created entity.
 */
 	public function create(
 		\sorm\interfaces\entity $_entity
-	) : \sorm\entity_manager {
+	) : \sorm\interfaces\entity {
 
 		$classname=get_class($_entity);
 		if(!array_key_exists($classname, $this->definition_map)) {
@@ -191,7 +207,7 @@ public function fetch_one(
 			}
 			$_entity->$setter($pk_value->get_value());
 
-			return $this;
+			return $_entity;
 		}
 		catch(\Exception $e) {
 
@@ -205,11 +221,11 @@ public function fetch_one(
 
 /**
 *attemps to update an entity. Rules of persistence are those of the underlying
-*storage.
+*storage. Returns the updated entity
 */
 	public function update(
 		\sorm\interfaces\entity $_entity
-	) : \sorm\entity_manager {
+	) : \sorm\interfaces\entity {
 
 		$classname=get_class($_entity);
 		if(!array_key_exists($classname, $this->definition_map)) {
@@ -260,7 +276,7 @@ public function fetch_one(
 		try {
 
 			$this->storage_interface->update($payload);
-			return $this;
+			return $_entity;
 		}
 		catch(\Exception $e) {
 
@@ -274,11 +290,12 @@ public function fetch_one(
 
 /**
 *attemps to delete an entity. Rules of persistence are those of the underlying
-*storage.
+*storage. Returns the deleted entity, which will still have the same state
+*as it had.
 */
 	public function delete(
 		\sorm\interfaces\entity $_entity
-	) : \sorm\entity_manager {
+	) : \sorm\interfaces\entity {
 
 		$classname=get_class($_entity);
 		if(!array_key_exists($classname, $this->definition_map)) {
@@ -314,7 +331,7 @@ public function fetch_one(
 		try {
 
 			$this->storage_interface->delete($payload);
-			return $this;
+			return $_entity;
 		}
 		catch(\Exception $e) {
 

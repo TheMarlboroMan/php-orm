@@ -52,46 +52,14 @@ class entity_inflator {
 		$classname=get_class($_entity);
 
 		foreach($_definition as $property) {
-
-			$setter=$this->property_mapper->setter_from_property($classname, $property);
 			$fieldname=$property->get_field();
 
 			if(array_key_exists($fieldname, $_data)) {
 
+
 				//TODO: Map this!!
 				$value=$_data[$fieldname];
-				if(null!==$this->value_mapper_factory && null!==$property->get_transform_key()) {
-
-					$transform=$this->value_mapper_factory->build_value_mapper($property->get_transform_key());
-					$value=$transform->from_storage($property->get_transform_method(), $value);
-
-					if(! (is_scalar($value) || null===$value)) {
-
-						throw new \sorm\exception\value_map("expected scalar value from '".$property->get_transform_key().":".$property->get_transform_value()."'");
-					}
-				}
-
-				switch($property->get_type()) {
-
-					case \sorm\types::t_any:
-						$_entity->$setter($value);
-					break;
-					case \sorm\types::t_bool:
-						$_entity->$setter((bool)$value);
-					break;
-					case \sorm\types::t_datetime:
-						$_entity->$setter(new \DateTime($value));
-					break;
-					case \sorm\types::t_double:
-						$_entity->$setter((double)$value);
-					break;
-					case \sorm\types::t_int:
-						$_entity->$setter((int)$value);
-					break;
-					case \sorm\types::t_string:
-						$_entity->$setter((string)$value);
-					break;
-				}
+				$this->set_value_to_property($value, $classname, $property, $_entity);
 			}
 		}
 
@@ -111,10 +79,55 @@ class entity_inflator {
 
 		foreach($_definition as $property) {
 
-			$setter=$this->property_mapper->setter_from_property($classname, $property);
+			$this->set_value_to_property($property->get_default(), $classname, $property, $_entity);
+		}
+	}
 
-			//Won't even check, sorry.
-			$_entity->$setter($property->get_default());
+/**
+*sets a value to a property using transformers if needed.
+*/
+
+	private function set_value_to_property(
+		$_value,
+		string $_classname,
+		\sorm\internal\entity_definition_property $_property,
+		\sorm\interfaces\entity $_entity
+	) {
+
+		$value=$_value;
+
+		if(null!==$this->value_mapper_factory && null!==$_property->get_transform_key()) {
+
+			$transform=$this->value_mapper_factory->build_value_mapper($_property->get_transform_key());
+			$value=$transform->from_storage($_property->get_transform_method(), $_value);
+
+			if(! (is_scalar($value) || null===$value)) {
+
+				throw new \sorm\exception\value_map("expected scalar value from '".$property->get_transform_key().":".$property->get_transform_value()."'");
+			}
+		}
+
+		$setter=$this->property_mapper->setter_from_property($_classname, $_property);
+		switch($_property->get_type()) {
+
+			case \sorm\types::t_any:
+				$_entity->$setter($value);
+			break;
+			case \sorm\types::t_bool:
+				$_entity->$setter((bool)$value);
+			break;
+			case \sorm\types::t_datetime:
+				$_entity->$setter(new \DateTime($value));
+			break;
+			case \sorm\types::t_double:
+				$_entity->$setter((double)$value);
+			break;
+			case \sorm\types::t_int:
+				$_entity->$setter((int)$value);
+			break;
+			case \sorm\types::t_string:
+				$_entity->$setter((string)$value);
+			break;
 		}
 	}
 
