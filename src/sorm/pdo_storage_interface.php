@@ -99,6 +99,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 			throw new \sorm\exception\exception("could not fetch data");
 		}
 
+		$total=-1;
 		if(strlen($calc)) {
 
 			$total=$this->pdo->query('SELECT FOUND_ROWS();')->fetch(\PDO::FETCH_COLUMN);
