@@ -82,6 +82,39 @@ class entity_manager {
 	}
 
 /**
+*retrieves a single entity from the database.
+*/
+public function fetch_one(
+	string $_class,
+	\sorm\interfaces\fetch_node $_criteria,
+	?\sorm\internal\order_by $_order=null
+) : ?\sorm\interfaces\entity {
+
+	if(!array_key_exists($_class, $this->definition_map)) {
+
+		throw new \sorm\exception\malformed_setup("entity for '$_class' is not defined");
+	}
+
+	$collection=$this->storage_interface->fetch(
+		$this->definition_map[$_class],
+		$this->entity_inflator,
+		$this->value_mapper_factory,
+		$_criteria,
+		$_order,
+		new \sorm\internal\limit_offset(1, 0)
+	);
+
+	if(!$collection->get_count()) {
+
+		return null;
+	}
+
+	$result=$collection->next();
+	unset($collection);
+	return $result;
+}
+
+/**
 *creates a default constructed entity with all values set as default by the
 *map file.
 */
