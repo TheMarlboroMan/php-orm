@@ -126,7 +126,7 @@ public function fetch_one(
 
 		return $this->fetch_one(
 			$_class,
-			$this->fetch->equals($this->definition_map[$_class]->get_primary_key_name(), $_id)
+			$this->get_fetch_builder()->equals($this->definition_map[$_class]->get_primary_key_name(), $_id)
 		);
 	}
 
