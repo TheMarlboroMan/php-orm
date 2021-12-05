@@ -108,6 +108,13 @@ class entity_inflator {
 		}
 
 		$setter=$this->property_mapper->setter_from_property($_classname, $_property);
+
+		if($_property->is_nullable() && null===$value) {
+
+			$_entity->$setter($value);
+			return;
+		}
+
 		switch($_property->get_type()) {
 
 			case \sorm\types::t_any:
