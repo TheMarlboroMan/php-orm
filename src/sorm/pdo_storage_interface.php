@@ -30,8 +30,10 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 		if(null===$this->fetch_translator) {
 
-			$this->fetch_translator=new \sorm\internal\pdo_fetch_translator($_def, $_value_mapper_factory);
+			$this->fetch_translator=new \sorm\internal\pdo_fetch_translator($_value_mapper_factory);
 		}
+
+		$this->fetch_translator->set_entity_definition($_def);
 
 		$calc="";
 		if(

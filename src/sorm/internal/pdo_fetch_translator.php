@@ -9,12 +9,21 @@ use \sorm\internal\fetch\flags as flags;
 class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 
 	public function __construct(
-		\sorm\internal\entity_definition $_def,
 		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory
 	) {
 
-		$this->entity_definition=$_def;
 		$this->value_mapper_factory=$_value_mapper_factory;
+	}
+
+/**
+*sets the entity definition for the given fetch operation.
+*/
+
+	public function set_entity_definition(
+		\sorm\internal\entity_definition $_def
+	) {
+
+		$this->entity_definition=$_def;
 	}
 
 /***
@@ -335,8 +344,8 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 	private array                   $custom_handlers=[];
 */
 
-	private array                               $buffer=[];
-	private array                               $arguments=[];
-	private \sorm\internal\entity_definition    $entity_definition;
-	private ?\sorm\interfaces\value_mapper_factory $value_mapper_factory;
+	private array                                   $buffer=[];
+	private array                                   $arguments=[];
+	private ?\sorm\internal\entity_definition       $entity_definition=null;
+	private ?\sorm\interfaces\value_mapper_factory  $value_mapper_factory;
 }

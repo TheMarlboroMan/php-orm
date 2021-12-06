@@ -25,6 +25,7 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Fixed
 - fixes entity inflator not working properly with default datetimes.
 - fixes entity inflator not assigning null to nullable datetime values.
+- fixes bug when selecting different types of entities with the same entity manager.
 
 ## [v0.0.1]: 2021-12-03
 ### Added
