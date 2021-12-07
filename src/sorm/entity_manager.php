@@ -208,7 +208,9 @@ public function fetch_one(
 
 				throw new \sorm\exception\malformed_setup("entity ".get_class($_entity)." does not implement setter ".$setter);
 			}
-			$_entity->$setter($pk_value->get_value());
+
+			//assumed to be an integer.
+			$_entity->$setter((int)$pk_value->get_value());
 
 			return $_entity;
 		}
