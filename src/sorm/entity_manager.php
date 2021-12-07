@@ -364,5 +364,6 @@ public function fetch_one(
 	private ?\sorm\interfaces\entity_name_mapper    $entity_name_mapper;
 	private ?\sorm\fetch                            $fetch_builder=null;
 	private ?\sorm\interfaces\value_mapper_factory  $value_mapper_factory=null;
+	private \sorm\internal\entity_inflator          $entity_inflator;
 	private array                                   $definition_map=[]; //!<Map of fully qualified classname to entity_definition.
 }
