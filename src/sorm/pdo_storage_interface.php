@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 namespace sorm;
 
 /**
 *PDO storage implementation.
 */
 class pdo_storage_interface implements \sorm\interfaces\storage_interface {
+
+	use \sorm\traits\strict;
 
 /**
 *class constructor. Sets the PDO mode to throw exceptions and to not

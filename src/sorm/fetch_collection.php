@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm;
 
 /**
@@ -6,6 +7,8 @@ namespace sorm;
 *the resulting entities.
 */
 class fetch_collection implements \sorm\interfaces\fetch_collection {
+
+	use \sorm\traits\strict;
 
 	public function         __construct(
 		\PDOStatement $_statement,

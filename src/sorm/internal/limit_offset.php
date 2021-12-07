@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
@@ -7,6 +8,8 @@ namespace sorm\internal;
 */
 
 class limit_offset {
+
+	use \sorm\traits\strict;
 
 	public const no_limit=-1;
 

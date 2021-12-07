@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
@@ -7,6 +8,8 @@ namespace sorm\internal;
 */
 
 class order_by implements \IteratorAggregate{
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		array $_order_nodes
@@ -21,7 +24,7 @@ class order_by implements \IteratorAggregate{
 
 	public function has_order() : bool {
 
-		return count($this->order_nodes);
+		return (bool)count($this->order_nodes);
 	}
 
 //begin iteratoraggregate implementation

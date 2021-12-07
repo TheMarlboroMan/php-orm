@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm;
 
 use \sorm\internal\fetch\flags as flags;
@@ -9,6 +10,8 @@ use \sorm\internal\fetch\flags as flags;
 *this is clearly based on sql, but lacks many sql specifics.
 */
 class fetch {
+
+	use \sorm\traits\strict;
 
 	public const    order_asc=0;
 	public const    order_desc=1;

@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
 *this class takes a map file and sets up entity definitions from it.
 */
 class map_loader {
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		\log\logger_interface $_logger,

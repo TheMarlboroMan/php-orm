@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
@@ -6,6 +7,8 @@ namespace sorm\internal;
 */
 
 class entity_inflator {
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		\sorm\interfaces\entity_factory $_entity_factory,
@@ -103,7 +106,7 @@ class entity_inflator {
 
 			if(! (is_scalar($value) || null===$value)) {
 
-				throw new \sorm\exception\value_map("expected scalar value from '".$property->get_transform_key().":".$property->get_transform_value()."'");
+				throw new \sorm\exception\value_map("expected scalar value from '".$_property->get_transform_key().":".$_property->get_transform_method()."'");
 			}
 		}
 

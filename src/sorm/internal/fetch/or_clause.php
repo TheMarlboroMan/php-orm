@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal\fetch;
 
 /**
 *expresses a sequence of clauses out of which one of them must be true.
 */
 class or_clause implements \sorm\interfaces\fetch_node {
+
+	use \sorm\traits\strict;
 
 	public function     __construct(
 		int $_flags,

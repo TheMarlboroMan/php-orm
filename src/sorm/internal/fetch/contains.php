@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal\fetch;
 
 /**
@@ -7,6 +8,8 @@ namespace sorm\internal\fetch;
 *as to negate the results.
 */
 class contains implements \sorm\interfaces\fetch_node {
+
+	use \sorm\traits\strict;
 
 	public function     __construct(
 		int $_flags,

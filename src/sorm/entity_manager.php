@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm;
 
 /**
@@ -7,6 +8,8 @@ namespace sorm;
 *of implementation-dependant instances to work.
 */
 class entity_manager {
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		string $_map_file_path,

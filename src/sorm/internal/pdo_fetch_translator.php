@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 use \sorm\internal\fetch\flags as flags;
@@ -7,6 +8,8 @@ use \sorm\internal\fetch\flags as flags;
 *provides a fetch translator for PDO.
 */
 class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		?\sorm\interfaces\value_mapper_factory $_value_mapper_factory

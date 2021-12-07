@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
 *defines a payload value, consisting of a value and its type.
 */
 class value {
+
+	use \sorm\traits\strict;
 
 	public function         __construct(
 		$_value,

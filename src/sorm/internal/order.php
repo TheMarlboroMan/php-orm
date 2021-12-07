@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 /**
 *a single order clause, expresses that fetch results must be ordered according
 *to the given field name and in the given order.
 */
 class order {
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		string $_fieldname,

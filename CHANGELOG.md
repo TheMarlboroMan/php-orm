@@ -15,6 +15,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 - readme documentation
 - cover edge cases (boolean testing for non-boolean transformations)
 
+## [v0.0.3]: 2021-12-07
+### Added
+- added strict types and strict trait
+
 ## [v0.0.2]: 2021-12-05
 ### Added
 - fetch one and fetch_by_id to entity manager

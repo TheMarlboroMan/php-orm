@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
@@ -6,6 +7,8 @@ namespace sorm\internal;
 *works in php, wich a few exceptions.
 */
 class entity_definition_property {
+
+	use \sorm\traits\strict;
 
 	public function __construct(
 		string $_property,

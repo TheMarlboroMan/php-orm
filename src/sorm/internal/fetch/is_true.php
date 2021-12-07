@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal\fetch;
 
 /**
@@ -6,6 +7,8 @@ namespace sorm\internal\fetch;
 *value.
 */
 class is_true implements \sorm\interfaces\fetch_node {
+
+	use \sorm\traits\strict;
 
 	public function     __construct(
 		int $_flags,

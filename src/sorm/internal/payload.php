@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
@@ -7,6 +8,8 @@ namespace sorm\internal;
 *to be set.
 */
 class payload implements \Countable, \IteratorAggregate, \ArrayAccess {
+
+	use \sorm\traits\strict;
 
 	public function             __construct(
 		\sorm\internal\entity_definition $_definition

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace sorm\internal;
 
 /**
@@ -6,6 +7,8 @@ namespace sorm\internal;
 *the storage layer. If used as an array, the property definitions are accesed.
 */
 class entity_definition implements \Countable, \IteratorAggregate, \ArrayAccess {
+
+	use \sorm\traits\strict;
 
 /**
 *returns true if this entity has a primary key defined.
