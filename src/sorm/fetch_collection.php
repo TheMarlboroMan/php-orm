@@ -77,6 +77,7 @@ class fetch_collection implements \sorm\interfaces\fetch_collection {
 
 	private int             $count;
 	private int             $unlimited_count;
+	private \PDOStatement   $statement;
 	private \sorm\internal\entity_definition $definition;
 	private \sorm\internal\entity_inflator $inflator;
 
