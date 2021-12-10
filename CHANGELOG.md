@@ -15,6 +15,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 - readme documentation
 - cover edge cases (boolean testing for non-boolean transformations)
 
+## [v0.0.4]: 2021-12-10
+### Added
+- fixes update error in pdo storage interface (did not count as update if no changes were made!)
+
 ## [v0.0.3]: 2021-12-07
 ### Added
 - added strict types and strict trait

@@ -146,10 +146,19 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		\sorm\internal\payload $_payload
 	) : void {
 
-		$stmt=$this->get_update_statement($_payload);
-
 		$definition=$_payload->get_entity_definition();
 		$pk=$_payload[$definition->get_primary_key_name()];
+
+		//before even attempting this, let us see if there'a row here...
+		$check_stmt=$this->get_check_statement($_payload);
+		$check_stmt->bindValue(":pk", $this->to_pdo_value($pk), $this->to_pdo_type($pk));
+		$check_stmt->execute();
+		if(!$check_stmt->rowCount()) {
+
+			throw new \sorm\exception\exception("entity could not be found for update");
+		}
+
+		$stmt=$this->get_update_statement($_payload);
 		$stmt->bindValue(":pk", $this->to_pdo_value($pk), $this->to_pdo_type($pk));
 		foreach($_payload as $key => $value) {
 
@@ -161,10 +170,13 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 			throw new \sorm\exception\exception("could not update entity");
 		}
 
+/*
+		this might return zero if no changes were made!!
 		if(!$stmt->rowCount()) {
 
-			throw new \sorm\exception\exception("entity could not be found for update");
+
 		}
+*/
 	}
 
 	public function delete(
@@ -211,6 +223,21 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 		}
 
 		return $this->create_statements_map[$classname];
+	}
+
+	private function            get_check_statement(
+		\sorm\internal\payload $_payload
+	) : \PDOStatement {
+
+		$definition=$_payload->get_entity_definition();
+		$classname=$definition->get_class_name();
+		if(!array_key_exists($classname, $this->create_statements_map)) {
+
+			$query_string="SELECT `".$definition->get_primary_key_name()."` AS id FROM `".$definition->get_storage_key()."` WHERE `".$definition->get_primary_key_name()."` = :pk";
+			$this->check_statements_map[$classname]=$this->pdo->prepare($query_string);
+		}
+
+		return $this->check_statements_map[$classname];
 	}
 
 	private function            get_update_statement(
@@ -310,6 +337,7 @@ class pdo_storage_interface implements \sorm\interfaces\storage_interface {
 
 	private \PDO                $pdo;
 	private array               $create_statements_map=[];
+	private array               $check_statements_map=[];
 	private array               $update_statements_map=[];
 	private array               $delete_statements_map=[];
 	private array               $fetch_statements=[];
