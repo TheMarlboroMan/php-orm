@@ -13,6 +13,12 @@ interface fetch_translator {
 *must convert the clause into something that can be interpreted by the
 *storage layer.
 */
+	public function do_static_clause(\sorm\internal\fetch\static_clause $_node) : void;
+
+/**
+*must convert the clause into something that can be interpreted by the
+*storage layer.
+*/
 	public function do_and(\sorm\internal\fetch\and_clause $_node) : void;
 
 /**

@@ -94,6 +94,18 @@ class fetch {
 	}
 
 /**
+*creates a static clause that will always be true or false, depending on the
+*value passed to this method.  
+*/
+	public function static_clause(
+		 bool $_type
+	) : \sorm\interfaces\fetch_node {
+
+		$flags=$_type ? 0 : \sorm\internal\fetch\flags::negative;
+		return new \sorm\internal\fetch\static_clause($flags);
+	}
+
+/**
 *equality test for numeric values
 */
 	public function equals(

@@ -224,6 +224,13 @@ class pdo_fetch_translator implements \sorm\interfaces\fetch_translator {
 			: "(`$field`)";
 	}
 
+	public function do_static_clause(\sorm\internal\fetch\static_clause $_node) : void {
+
+		$this->buffer[]=$_node->get_flags() & flags::negative
+			? "(FALSE)"
+			: "(TRUE)";
+	}
+
 /**
 *creates a numeric comparison
 */

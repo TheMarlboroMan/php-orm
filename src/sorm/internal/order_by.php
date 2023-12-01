@@ -11,6 +11,9 @@ class order_by implements \IteratorAggregate{
 
 	use \sorm\traits\strict;
 
+/**
+*@param \sorm\internal\order[] $_order_nodes
+*/
 	public function __construct(
 		array $_order_nodes
 	) {
@@ -36,6 +39,6 @@ class order_by implements \IteratorAggregate{
 
 //end iteratoraggregate implementation
 
-
+	/** @var \sorm\internal\order[] */
 	private array $order_nodes=[];
 }
